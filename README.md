@@ -29,7 +29,7 @@ UseSteady adds a mandatory review layer:
   [a] Approve   [r] Reject
 ```
 
-You see the exact change. You decide. Then it runs.
+You see the exact change. You decide. Then it runs safely.
 
 ---
 
