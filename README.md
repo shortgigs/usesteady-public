@@ -2,8 +2,8 @@
 
 **Developer CLI for safe AI-assisted code changes.**
 
-UseSteady sits between your AI tool and your filesystem.  
-It shows you exactly what will run â€” before it runs.  
+UseSteady sits between your AI tool and your filesystem.
+It shows you exactly what will run - before it runs.
 Nothing executes without your explicit approval.
 
 ```
@@ -14,19 +14,19 @@ npx usesteady
 
 ## The problem
 
-AI coding tools can rename files, delete code, and run commands â€” often before you've fully read what they're about to do.
+AI coding tools can rename files, delete code, and run commands - often before you've fully read what they're about to do.
 
 UseSteady adds a mandatory review layer:
 
 ```
   SYSTEM WILL
 
-  1. Replace "Submit" â†’ "Continue"
+  1. Replace "Submit" -> "Continue"
      in src/components/Button.tsx
 
   RISK: LOW
 
-  [a] Approve   [r] Reject
+  Approve this task? (y/n)
 ```
 
 You see the exact change. You decide. Then it runs.
@@ -36,9 +36,9 @@ You see the exact change. You decide. Then it runs.
 ## How it works
 
 ```
-Exact input  â†’  SYSTEM WILL  â†’  You approve  â†’  runs
-Vague input  â†’  Guidance     â†’  You rewrite  â†’  SYSTEM WILL
-Dangerous    â†’  Hard block   â†’  Stopped before any LLM sees it
+Exact input  ->  SYSTEM WILL  ->  You approve  ->  runs
+Vague input  ->  Guidance     ->  You rewrite  ->  SYSTEM WILL
+Dangerous    ->  Hard block   ->  Stopped before any LLM sees it
 ```
 
 **UseSteady will never guess and execute.**
@@ -55,8 +55,18 @@ npx usesteady
 npm install -g usesteady
 ```
 
-Requires **Node.js 18+**.  
+Requires **Node.js 18+**.
 Optional: set `ANTHROPIC_API_KEY` for richer guidance on ambiguous inputs.
+
+### One path per environment
+
+| Environment | Command |
+|---|---|
+| Interactive | `npx usesteady` |
+| Windows PowerShell | `npx usesteady --prompt "replace 'X' with 'Y' in file"` |
+| macOS / zsh | `npx usesteady --prompt 'replace "X" with "Y" in file'` |
+| Piped stdin | `echo "rename old.ts to new.ts" \| npx usesteady` |
+| CI / automation | `npx usesteady run spec.json --yes` |
 
 ---
 
@@ -70,16 +80,16 @@ Optional: set `ANTHROPIC_API_KEY` for richer guidance on ambiguous inputs.
 | `delete` | `delete file src/legacy/old.ts` |
 | `run` | `run npm test` |
 
-Vague, compound, or dangerous inputs are blocked and explained â€” not silently executed.
+Vague, compound, or dangerous inputs are blocked and explained - not silently executed.
 
 ---
 
 ## What it blocks
 
-- Vague requests (`update the button text` â†’ asks which file)
-- Compound requests (`rename X and update imports` â†’ one change at a time)
-- Dangerous commands (`run rm -rf /`, `run sudo ...` â†’ hard block)
-- Path traversal (`../../etc/passwd` â†’ blocked)
+- Vague requests (`update the button text` -> asks which file)
+- Compound requests (`rename X and update imports` -> one change at a time)
+- Dangerous commands (`run rm -rf /`, `run sudo ...` -> hard block)
+- Path traversal (`../../etc/passwd` -> blocked)
 
 ---
 
@@ -97,13 +107,13 @@ $ npx usesteady
 
 > replace "Submit" with "Continue" in src/components/Button.tsx
 
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+----------------------------------------
   [Cursor] PREPARED
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+----------------------------------------
 
   SYSTEM WILL
 
-  1. Replace "Submit" â†’ "Continue"
+  1. Replace "Submit" -> "Continue"
      in src/components/Button.tsx
 
   RISK: LOW
@@ -111,18 +121,18 @@ $ npx usesteady
   WHY
   Updates button label. Styling only, no logic affected.
 
-  [a] Approve   [r] Reject
+  Approve this task? (y/n)
 
-> a
+> y
 
-  âœ“ Step approved â€” Button.tsx updated.
+  OK Step approved - Button.tsx updated.
 ```
 
 ---
 
 ## Mental model
 
-Like `git diff` â€” but for AI actions, before they execute.
+Like `git diff` - but for AI actions, before they execute.
 
 ---
 
@@ -137,12 +147,12 @@ Like `git diff` â€” but for AI actions, before they execute.
 
 ## Category
 
-Developer Tool Â· CLI Â· Software Engineering Â· AI Safety Â· Code Review
+Developer Tool | CLI | Software Engineering | AI Safety | Code Review
 
 ---
 
 ## License
 
-Apache 2.0 â€” free to use, modify, and distribute.
+Apache 2.0 - free to use, modify, and distribute.
 
-Built by [Shortgigs LLC](https://usesteady.dev/about) Â· Contact: founder@shortgigs.io
+Built by [Shortgigs LLC](https://usesteady.dev/about) | Contact: founder@shortgigs.io
