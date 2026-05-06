@@ -1,0 +1,48 @@
+name: Misuse or safety issue
+description: Report unsafe behavior, policy bypass risk, or misuse vector.
+title: "[safety] "
+labels:
+  - status/pending
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for safety concerns, abuse vectors, or policy bypass risks.
+        If urgent, include severity and immediate mitigation.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - low
+        - medium
+        - high
+        - critical
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: Risk summary
+      description: What could go wrong?
+      placeholder: This path may allow execution without explicit approval when ...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction or trigger conditions
+      description: Include minimal reproducible steps if available.
+      placeholder: |
+        1) Configure ...
+        2) Trigger ...
+        3) Observe ...
+    validations:
+      required: false
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Suggested mitigation
+      placeholder: Fail closed when ... and surface clear blocking reason.
+    validations:
+      required: false
