@@ -1,0 +1,41 @@
+name: Feature request
+description: Propose a specific feature or product improvement.
+title: "[feature] "
+labels:
+  - status/pending
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please keep this request concrete and outcome-focused.
+  - type: input
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem are you trying to solve?
+      placeholder: I cannot automate batch edits safely in CI without ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution
+      description: Describe the desired behavior, not implementation details.
+      placeholder: Add a structured output mode that ...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: Current workaround is ...
+    validations:
+      required: false
+  - type: textarea
+    id: success
+    attributes:
+      label: Success criteria
+      description: How will we know this request is solved?
+      placeholder: I can run X flow with Y reliability.
+    validations:
+      required: true
