@@ -1,0 +1,29 @@
+{
+  "name": "docs-refactor",
+  "tasks": [
+    {
+      "input": "create users.md",
+      "operationType": "write_file",
+      "targetFiles": ["users.md"],
+      "content": "# Users\n\nDocumentation for the user model:\n\n- registration\n- authentication\n- profile management\n- account deletion\n"
+    },
+    {
+      "input": "create orders.md",
+      "operationType": "write_file",
+      "targetFiles": ["orders.md"],
+      "content": "# Orders\n\nDocumentation for the order model:\n\n- creation flow\n- payment lifecycle\n- refunds\n- audit log\n"
+    },
+    {
+      "input": "create reports.md",
+      "operationType": "write_file",
+      "targetFiles": ["reports.md"],
+      "content": "# Reports\n\nDocumentation for the reporting layer:\n\n- daily summary\n- weekly digest\n- export formats\n- retention policy\n"
+    },
+    {
+      "input": "create README.md",
+      "operationType": "write_file",
+      "targetFiles": ["README.md"],
+      "content": "# Project Docs\n\n- [Users](users.md)\n- [Orders](orders.md)\n- [Reports](reports.md)\n"
+    }
+  ]
+}
