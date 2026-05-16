@@ -1,0 +1,188 @@
+$ # ===============================================================
+$ # BEAT 1  -  INSPECT BEFORE EXECUTION
+$ # ===============================================================
+$ # AI wants to refactor docs into 4 markdown files.
+$ # Read what will happen. No LLM. No writes. No approval prompt.
+$ usesteady workflow inspect spec.json --workspace-root <WS>
+
+Workflow: docs-refactor
+  Spec:     <WS>/spec.json
+  Root:     <WS>
+  Tasks:    4
+
+  Op histogram
+    write_file  4
+
+  Target tree
+    README.md   create
+    orders.md   create
+    reports.md  create
+    users.md    create
+
+  Findings: none
+
+  Summary: 4 tasks, 0 findings (0 static, 0 fs-dependent).
+
+$ # ===============================================================
+$ # BEAT 2  -  RUN, INTERRUPTED MID-FLIGHT
+$ # ===============================================================
+$ # Operator approved by inspecting first. --yes proceeds.
+$ # Simulate: process killed after task 2/4 (CI timeout, Ctrl+C, crash).
+$ usesteady run spec.json <WS> --yes
+
+Loaded spec: "docs-refactor" (4 task(s))
+  Workspace:   <WS>
+
+----------------------------------------------------
+  REVIEW  "docs-refactor"  -  4 tasks
+----------------------------------------------------
+
+    1. [cursor] create users.md
+       Target:  users.md
+  [killed mid-run after task 2/4]
+
+$ # ===============================================================
+$ # BEAT 3  -  VISIBLE RESUME ARTIFACT ON DISK
+$ # ===============================================================
+$ ls <WS>
+  .usesteady/
+  orders.md
+  users.md
+
+$ # The token is plain JSON in the operator's workspace.
+$ cat <WS>/.usesteady/resume-tokens/<id>.json
+{"format":"usesteady.resume-token.v1","workflow_run_id":"6cc80910ea02f5fe","workflow_name":"docs-refactor","workflow_spec_hash":"bf188b100457db8abc90c8ab9a860b66e439466f22d3951a8787cf451a8ba3cd","spec_path":"<WS>/spec.json","workspace_root":"<WS>","completed_task_count":2,"total_task_count":4,"completed_task_summaries":[{"index":0,"label":"create users.md","op_type":"write_file","idempotency_class":"checkable"},{"index":1,"label":"create orders.md","op_type":"write_file","idempotency_class":"checkable"}],"issued_at":"2026-05-16T21:03:13.524Z","issued_by":"usesteady-cli","token_id":"sha256:ad3b2003807dd838"}
+
+$ # ===============================================================
+$ # BEAT 4  -  RESUME-INFO (READ-ONLY VERIFICATION)
+$ # ===============================================================
+$ # Inspect the token before resuming. Same verification the resume
+$ # path will run, but executes nothing. Just verifies.
+$ usesteady workflow resume-info <token> --spec spec.json --workspace-root <WS>
+
+Resume token: sha256:ad3b2003807dd838
+  Workflow:     docs-refactor
+  Run ID:       6cc80910ea02f5fe
+  Completed:    2/4
+  Workspace:    <WS>
+
+  Verification report
+    already_done:        2
+    requires_reconfirm:  0
+    previously_skipped:  0
+    diverged:            0
+    aggregate:           clean
+
+  Per-task verdicts
+    [ok ] task[0] write_file    create users.md
+          -> already_done: users.md exists
+    [ok ] task[1] write_file    create orders.md
+          -> already_done: orders.md exists
+
+  No execution occurred. No tasks ran. No workspace changes.
+
+$ # ===============================================================
+$ # BEAT 5  -  RESUME
+$ # ===============================================================
+$ # Point at the token. Approvals NOT inherited. Each "already-done"
+$ # claim is re-verified against current disk state.
+$ usesteady run spec.json <WS> --yes --resume-from <token>
+
+Loaded spec: "docs-refactor" (4 task(s))
+  Workspace:   <WS>
+
+  Resuming workflow "docs-refactor".
+    Token:      sha256:ad3b2003807dd838
+    Completed:  2/4 (verified already-done)
+    Remaining:  2 task(s)
+
+
+----------------------------------------------------
+  REVIEW  "docs-refactor"  -  4 tasks
+----------------------------------------------------
+
+    1. [cursor] create users.md
+       Target:  users.md
+       Content: "# Users\n\nDocumentation for the user model:\n\n- registration\n- authen" (truncated; 116 chars total)
+    -----
+    2. [cursor] create orders.md
+       Target:  orders.md
+       Content: "# Orders\n\nDocumentation for the order model:\n\n- creation flow\n- pay" (truncated; 104 chars total)
+    -----
+    3. [cursor] create reports.md
+       Target:  reports.md
+       Content: "# Reports\n\nDocumentation for the reporting layer:\n\n- daily summary\n" (truncated; 119 chars total)
+    -----
+    4. [cursor] create README.md
+       Target:  README.md
+       Content: "# Project Docs\n\n- [Users](users.md)\n- [Orders](orders.md)\n- [Reports" (truncated; 82 chars total)
+
+
+----------------------------------------------------
+  APPROVE?  Task 3 of 4
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 3: Create file reports.md
+  Previous: [done]  create orders.md
+  You asked:  create reports.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    reports.md
+    Content (9 lines, 119 chars):
+      | # Reports
+      |
+      | Documentation for the reporting layer:
+      |
+      | - daily summary
+      | - weekly digest
+       3 more lines truncated
+    File note: If reports.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  APPROVE?  Task 4 of 4
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 4: Create file README.md
+  Previous: [done]  create reports.md
+  You asked:  create README.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    README.md
+    Content (6 lines, 82 chars):
+      | # Project Docs
+      |
+      | - [Users](users.md)
+      | - [Orders](orders.md)
+      | - [Reports](reports.md)
+      |
+    File note: If README.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  COMPLETED
+----------------------------------------------------
+  Workflow "docs-refactor" completed.
+  Tasks:
+    [done] create users.md
+    [done] create orders.md
+    [done] create reports.md
+    [done] create README.md
+
+
+  ok Completed successfully
+  Steps: 4 / 4
+
+
+  Goodbye.
+
+$ # Workflow complete. All 4 files present.
+$ ls <WS>
+  .usesteady/
+  README.md
+  orders.md
+  reports.md
+  users.md
+
+$ # Exit codes: inspect=0, run=0, resume-info=0, resume=0
+$ # No autonomous continuation. No inherited authority. Operator owned every step.

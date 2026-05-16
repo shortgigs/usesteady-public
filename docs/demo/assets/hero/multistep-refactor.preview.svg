@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1018 724" width="1018" height="724" role="img" aria-label="usesteady: multi-step refactor -&gt; inspect -&gt; interrupt -&gt; resume - preview frame">
+  <title>usesteady: multi-step refactor -&gt; inspect -&gt; interrupt -&gt; resume - preview frame</title>
+  <desc>UseSteady demo: multistep-refactor - static preview SVG showing the key moment ("Resuming workflow").</desc>
+  <rect width="100%" height="100%" rx="10" ry="10" fill="#0a0a0a" stroke="#1c1c1c" stroke-width="1" />
+  <rect width="100%" height="32" rx="10" ry="10" fill="#161616" />
+  <rect y="22" width="100%" height="10" fill="#161616" />
+  <line x1="0" y1="32" x2="1018" y2="32" stroke="#222222" stroke-width="1" />
+  <circle cx="20" cy="16" r="6" fill="#ff5f56" />
+  <circle cx="40" cy="16" r="6" fill="#ffbd2e" />
+  <circle cx="60" cy="16" r="6" fill="#27c93f" />
+  <text x="80" y="20" fill="#666666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">usesteady: multi-step refactor -&gt; inspect -&gt; interrupt -&gt; resume</text>
+  <g>
+    <rect x="807" y="6" width="199" height="20" rx="10" fill="#0e2820" stroke="#7ee0a3" stroke-width="1" opacity="0.9" />
+    <text x="906.5" y="20" fill="#7ee0a3" font-family="ui-sans-serif, system-ui, Helvetica, Arial, sans-serif" font-weight="600" font-size="12" text-anchor="middle">Inspect. Approve. Resume.</text>
+  </g>
+  <text x="14" y="72" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">          -&gt; already_done: users.md exists</text>
+  <text x="14" y="90" fill="#50fa7b" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    [ok ] task[1] write_file    create orders.md</text>
+  <text x="14" y="108" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">          -&gt; already_done: orders.md exists</text>
+  <text x="14" y="126" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="144" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">  No execution occurred. No tasks ran. No workspace changes.</text>
+  <text x="14" y="162" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="180" fill="#666666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ # ===============================================================</text>
+  <text x="14" y="198" fill="#666666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ # BEAT 5  -  RESUME</text>
+  <text x="14" y="216" fill="#666666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ # ===============================================================</text>
+  <text x="14" y="234" fill="#666666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ # Point at the token. Approvals NOT inherited. Each &quot;already-done&quot;</text>
+  <text x="14" y="252" fill="#666666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ # claim is re-verified against current disk state.</text>
+  <text x="14" y="270" fill="#00d4fa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ usesteady run spec.json &lt;WS&gt; --yes --resume-from &lt;token&gt;</text>
+  <text x="14" y="288" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="306" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">Loaded spec: &quot;docs-refactor&quot; (4 task(s))</text>
+  <text x="14" y="324" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">  Workspace:   &lt;WS&gt;</text>
+  <text x="14" y="342" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="360" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">  Resuming workflow &quot;docs-refactor&quot;.</text>
+  <text x="14" y="378" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    Token:      sha256:ad3b2003807dd838</text>
+  <text x="14" y="396" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    Completed:  2/4 (verified already-done)</text>
+  <text x="14" y="414" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    Remaining:  2 task(s)</text>
+  <text x="14" y="432" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="450" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="468" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">----------------------------------------------------</text>
+  <text x="14" y="486" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">  REVIEW  &quot;docs-refactor&quot;  -  4 tasks</text>
+  <text x="14" y="504" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">----------------------------------------------------</text>
+  <text x="14" y="522" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="540" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    1. [cursor] create users.md</text>
+  <text x="14" y="558" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Target:  users.md</text>
+  <text x="14" y="576" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Content: &quot;# Users\n\nDocumentation for the user model:\n\n- registration\n- authen&quot; (truncated; 116 ...</text>
+  <text x="14" y="594" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    -----</text>
+  <text x="14" y="612" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    2. [cursor] create orders.md</text>
+  <text x="14" y="630" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Target:  orders.md</text>
+  <text x="14" y="648" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Content: &quot;# Orders\n\nDocumentation for the order model:\n\n- creation flow\n- pay&quot; (truncated; 104 ...</text>
+  <text x="14" y="666" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    -----</text>
+  <text x="14" y="684" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    3. [cursor] create reports.md</text>
+  <text x="14" y="702" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Target:  reports.md</text>
+</svg>
