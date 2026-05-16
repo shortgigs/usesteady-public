@@ -1,0 +1,9 @@
+{
+  "name": "kill-mid-run",
+  "tasks": [
+    { "input": "create users.md",   "operationType": "write_file", "targetFiles": ["users.md"],   "content": "# Users\n\nUser model documentation.\n" },
+    { "input": "create orders.md",  "operationType": "write_file", "targetFiles": ["orders.md"],  "content": "# Orders\n\nOrder model documentation.\n" },
+    { "input": "create reports.md", "operationType": "write_file", "targetFiles": ["reports.md"], "content": "# Reports\n\nReporting model documentation.\n" },
+    { "input": "create README.md",  "operationType": "write_file", "targetFiles": ["README.md"],  "content": "# Docs index\n\n- [Users](users.md)\n- [Orders](orders.md)\n- [Reports](reports.md)\n" }
+  ]
+}

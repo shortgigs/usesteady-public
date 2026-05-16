@@ -1,0 +1,123 @@
+$ # Run a 3-task workflow to produce a complete token.
+$ usesteady run docs/demo/survivability/specs/04-resume-info.json --yes
+Loaded spec: "resume-info-demo" (3 task(s))
+  Workspace:   <WS>
+
+----------------------------------------------------
+  REVIEW  "resume-info-demo"  -  3 tasks
+----------------------------------------------------
+
+    1. [cursor] create config.json
+       Target:  config.json
+       Content: "{\"version\":1}\n"
+    -----
+    2. [cursor] create LICENSE
+       Target:  LICENSE
+       Content: "MIT\n"
+    -----
+    3. [cursor] create CONTRIBUTING.md
+       Target:  CONTRIBUTING.md
+       Content: "# Contributing\n"
+
+
+----------------------------------------------------
+  APPROVE?  Task 1 of 3
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 1: Create file config.json
+  You asked:  create config.json
+  Preview:
+    Operation: create (writes a new file)
+    Target:    config.json
+    Content (2 lines, 14 chars):
+      | {"version":1}
+      |
+    File note: If config.json already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  APPROVE?  Task 2 of 3
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 2: Create file LICENSE
+  Previous: [done]  create config.json
+  You asked:  create LICENSE
+  Preview:
+    Operation: create (writes a new file)
+    Target:    LICENSE
+    Content (2 lines, 4 chars):
+      | MIT
+      |
+    File note: If LICENSE already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  APPROVE?  Task 3 of 3
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 3: Create file CONTRIBUTING.md
+  Previous: [done]  create LICENSE
+  You asked:  create CONTRIBUTING.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    CONTRIBUTING.md
+    Content (2 lines, 15 chars):
+      | # Contributing
+      |
+    File note: If CONTRIBUTING.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  COMPLETED
+----------------------------------------------------
+  Workflow "resume-info-demo" completed.
+  Tasks:
+    [done] create config.json
+    [done] create LICENSE
+    [done] create CONTRIBUTING.md
+
+
+  ok Completed successfully
+  Steps: 3 / 3
+
+
+  Goodbye.
+
+$ # Read-only inspection — does NOT execute anything.
+$ usesteady workflow resume-info <token> --spec <spec> --workspace-root <WS>
+
+Resume token reports the workflow is already complete.
+    Workflow: resume-info-demo
+    Run ID:   3266aad9c3183df8
+    Tasks:    3/3
+  Nothing to resume.
+
+$ # Same data as JSON for machine consumers (CI, dashboards):
+$ usesteady workflow resume-info <token> --spec <spec> --workspace-root <WS> --output json
+
+{"success":true,"stage":"already_complete","token":{"format":"usesteady.resume-token.v1","workflow_run_id":"3266aad9c3183df8","workflow_name":"resume-info-demo","workflow_spec_hash":"940a577557a1bc10d71c34b74742c737dc656a01f9e2cc2fe67d97477e7f27bf","spec_path":"<WS>/spec.json","workspace_root":"<WS>","completed_task_count":3,"total_task_count":3,"completed_task_summaries":[{"index":0,"label":"create config.json","op_type":"write_file","idempotency_class":"checkable"},{"index":1,"label":"create LICENSE","op_type":"write_file","idempotency_class":"checkable"},{"index":2,"label":"create CONTRIBUTING.md","op_type":"write_file","idempotency_class":"checkable"}],"issued_at":"2026-05-16T16:52:58.836Z","issued_by":"usesteady-cli","token_id":"sha256:25a57620038acb3f"}}
+
+$ # === Now show a partial-completion token (1/3 done) ===
+$ usesteady workflow resume-info <token> --spec <spec> --workspace-root <WS>
+
+Resume token: sha256:25a57620038acb3f
+  Workflow:     resume-info-demo
+  Run ID:       3266aad9c3183df8
+  Completed:    1/3
+  Workspace:    <WS>
+
+  Verification report
+    already_done:        1
+    requires_reconfirm:  0
+    previously_skipped:  0
+    diverged:            0
+    aggregate:           clean
+
+  Per-task verdicts
+    [ok ] task[0] write_file    create config.json
+          → already_done: config.json exists
+
+  No execution occurred. No tasks ran. No workspace changes.
+
+$ # Exit codes: complete=0, json=0, partial=0
+$ # All read-only. No tasks ran. No files changed.

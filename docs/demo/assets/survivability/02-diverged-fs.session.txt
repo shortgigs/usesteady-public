@@ -1,0 +1,115 @@
+$ # Initial run completes both tasks.
+$ usesteady run docs/demo/survivability/specs/02-diverged-fs.json --yes
+
+Loaded spec: "diverged-fs" (2 task(s))
+  Workspace:   <WS>
+
+----------------------------------------------------
+  REVIEW  "diverged-fs"  -  2 tasks
+----------------------------------------------------
+
+    1. [cursor] create CHANGELOG.md
+       Target:  CHANGELOG.md
+       Content: "# Changelog\n\n## v0.1.0\n\n- initial release\n"
+    -----
+    2. [cursor] create VERSION
+       Target:  VERSION
+       Content: "0.1.0\n"
+
+
+----------------------------------------------------
+  APPROVE?  Task 1 of 2
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 1: Create file CHANGELOG.md
+  You asked:  create CHANGELOG.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    CHANGELOG.md
+    Content (6 lines, 42 chars):
+      | # Changelog
+      |
+      | ## v0.1.0
+      |
+      | - initial release
+      |
+    File note: If CHANGELOG.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  APPROVE?  Task 2 of 2
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 2: Create file VERSION
+  Previous: [done]  create CHANGELOG.md
+  You asked:  create VERSION
+  Preview:
+    Operation: create (writes a new file)
+    Target:    VERSION
+    Content (2 lines, 6 chars):
+      | 0.1.0
+      |
+    File note: If VERSION already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  COMPLETED
+----------------------------------------------------
+  Workflow "diverged-fs" completed.
+  Tasks:
+    [done] create CHANGELOG.md
+    [done] create VERSION
+
+
+  ok Completed successfully
+  Steps: 2 / 2
+
+
+  Goodbye.
+
+$ ls <WS>
+  [f]  CHANGELOG.md          42B
+  [f]  VERSION               6B
+
+$ # === Workspace state diverges from the token ===
+$ # (someone deleted CHANGELOG.md outside the workflow — token says it's done)
+$ ls <WS>
+  (empty)
+
+$ # Resume must refuse because verification fails:
+$ usesteady run docs/demo/survivability/specs/02-diverged-fs.json \
+    --yes --resume-from <WS>/.usesteady/resume-tokens/<id>.json
+
+Loaded spec: "diverged-fs" (2 task(s))
+  Workspace:   <WS>
+
+   Resume refused: workspace state diverged from token.
+    1 task(s) cannot be verified as already-done.
+    Run `usesteady workflow resume-info <WS>/.usesteady/resume-tokens/028f4bb91f76453f.json --spec <spec.json>` for the full per-task report.
+
+
+  Goodbye.
+
+
+$ # The detailed verification report:
+$ usesteady workflow resume-info <token> --spec <spec> --workspace-root <WS>
+Resume token: sha256:16e377eb9282f4e1
+  Workflow:     diverged-fs
+  Run ID:       028f4bb91f76453f
+  Completed:    1/2
+  Workspace:    <WS>
+
+  Verification report
+    already_done:        0
+    requires_reconfirm:  0
+    previously_skipped:  0
+    diverged:            1
+    aggregate:           diverged
+
+  Per-task verdicts
+    [!! ] task[0] write_file    create CHANGELOG.md
+          → task_state_diverged: expected CHANGELOG.md to exist (per completed token) but it is missing
+
+  No execution occurred. No tasks ran. No workspace changes.
+
+$ # Exit: initial=0, resume=1, info=0

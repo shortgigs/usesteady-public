@@ -1,0 +1,232 @@
+$ # Initial run completes all 4 tasks.
+$ usesteady run docs/demo/survivability/specs/01-kill-mid-run.json --yes
+
+Loaded spec: "kill-mid-run" (4 task(s))
+  Workspace:   <WS>
+
+----------------------------------------------------
+  REVIEW  "kill-mid-run"  -  4 tasks
+----------------------------------------------------
+
+    1. [cursor] create users.md
+       Target:  users.md
+       Content: "# Users\n\nUser model documentation.\n"
+    -----
+    2. [cursor] create orders.md
+       Target:  orders.md
+       Content: "# Orders\n\nOrder model documentation.\n"
+    -----
+    3. [cursor] create reports.md
+       Target:  reports.md
+       Content: "# Reports\n\nReporting model documentation.\n"
+    -----
+    4. [cursor] create README.md
+       Target:  README.md
+       Content: "# Docs index\n\n- [Users](users.md)\n- [Orders](orders.md)\n- [Reports](" (truncated; 80 chars total)
+
+
+----------------------------------------------------
+  APPROVE?  Task 1 of 4
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 1: Create file users.md
+  You asked:  create users.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    users.md
+    Content (4 lines, 35 chars):
+      | # Users
+      |
+      | User model documentation.
+      |
+    File note: If users.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  APPROVE?  Task 2 of 4
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 2: Create file orders.md
+  Previous: [done]  create users.md
+  You asked:  create orders.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    orders.md
+    Content (4 lines, 37 chars):
+      | # Orders
+      |
+      | Order model documentation.
+      |
+    File note: If orders.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  APPROVE?  Task 3 of 4
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 3: Create file reports.md
+  Previous: [done]  create orders.md
+  You asked:  create reports.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    reports.md
+    Content (4 lines, 42 chars):
+      | # Reports
+      |
+      | Reporting model documentation.
+      |
+    File note: If reports.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  APPROVE?  Task 4 of 4
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 4: Create file README.md
+  Previous: [done]  create reports.md
+  You asked:  create README.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    README.md
+    Content (6 lines, 80 chars):
+      | # Docs index
+      |
+      | - [Users](users.md)
+      | - [Orders](orders.md)
+      | - [Reports](reports.md)
+      |
+    File note: If README.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  COMPLETED
+----------------------------------------------------
+  Workflow "kill-mid-run" completed.
+  Tasks:
+    [done] create users.md
+    [done] create orders.md
+    [done] create reports.md
+    [done] create README.md
+
+
+  ok Completed successfully
+  Steps: 4 / 4
+
+
+  Goodbye.
+
+$ # Workspace after initial run:
+$ ls <WS>
+  [f]  orders.md             37B
+  [f]  README.md             80B
+  [f]  reports.md            42B
+  [f]  users.md              35B
+
+$ # === Simulate interruption: workflow was killed after task 2/4 ===
+$ # (token truncated to completed_task_count=2; tasks 3 and 4 rolled back)
+
+$ ls <WS>
+  [f]  orders.md             37B
+  [f]  users.md              35B
+
+$ # The visible resume token:
+$ cat <WS>/.usesteady/resume-tokens/<id>.json
+{"format":"usesteady.resume-token.v1","workflow_run_id":"c5bd5fc3d8f8e76d","workflow_name":"kill-mid-run","workflow_spec_hash":"09cfec0e1fd75bdc77ed62604b66ece5de3410e6b344d64577c5e6a56ba88149","spec_path":"<WS>/spec.json","workspace_root":"<WS>","completed_task_count":2,"total_task_count":4,"completed_task_summaries":[{"index":0,"label":"create users.md","op_type":"write_file","idempotency_class":"checkable"},{"index":1,"label":"create orders.md","op_type":"write_file","idempotency_class":"checkable"}],"issued_at":"2026-05-16T16:52:57.249Z","issued_by":"usesteady-cli","token_id":"sha256:850ff5c050dc1796"}
+
+$ # Resume from the token. No hidden state; just point at the file.
+$ usesteady run docs/demo/survivability/specs/01-kill-mid-run.json \
+    --yes --resume-from <WS>/.usesteady/resume-tokens/<id>.json
+
+Loaded spec: "kill-mid-run" (4 task(s))
+  Workspace:   <WS>
+
+  Resuming workflow "kill-mid-run".
+    Token:      sha256:850ff5c050dc1796
+    Completed:  2/4 (verified already-done)
+    Remaining:  2 task(s)
+
+
+----------------------------------------------------
+  REVIEW  "kill-mid-run"  -  4 tasks
+----------------------------------------------------
+
+    1. [cursor] create users.md
+       Target:  users.md
+       Content: "# Users\n\nUser model documentation.\n"
+    -----
+    2. [cursor] create orders.md
+       Target:  orders.md
+       Content: "# Orders\n\nOrder model documentation.\n"
+    -----
+    3. [cursor] create reports.md
+       Target:  reports.md
+       Content: "# Reports\n\nReporting model documentation.\n"
+    -----
+    4. [cursor] create README.md
+       Target:  README.md
+       Content: "# Docs index\n\n- [Users](users.md)\n- [Orders](orders.md)\n- [Reports](" (truncated; 80 chars total)
+
+
+----------------------------------------------------
+  APPROVE?  Task 3 of 4
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 3: Create file reports.md
+  Previous: [done]  create orders.md
+  You asked:  create reports.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    reports.md
+    Content (4 lines, 42 chars):
+      | # Reports
+      |
+      | Reporting model documentation.
+      |
+    File note: If reports.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  APPROVE?  Task 4 of 4
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 4: Create file README.md
+  Previous: [done]  create reports.md
+  You asked:  create README.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    README.md
+    Content (6 lines, 80 chars):
+      | # Docs index
+      |
+      | - [Users](users.md)
+      | - [Orders](orders.md)
+      | - [Reports](reports.md)
+      |
+    File note: If README.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  COMPLETED
+----------------------------------------------------
+  Workflow "kill-mid-run" completed.
+  Tasks:
+    [done] create users.md
+    [done] create orders.md
+    [done] create reports.md
+    [done] create README.md
+
+
+  ok Completed successfully
+  Steps: 4 / 4
+
+
+  Goodbye.
+
+$ # Workspace after resume:
+$ ls <WS>
+  [f]  orders.md             37B
+  [f]  README.md             80B
+  [f]  reports.md            42B
+  [f]  users.md              35B
+
+$ # Exit: initial=0, resume=0

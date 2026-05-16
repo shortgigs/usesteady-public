@@ -1,0 +1,8 @@
+{
+  "name": "resume-info-demo",
+  "tasks": [
+    { "input": "create config.json", "operationType": "write_file", "targetFiles": ["config.json"], "content": "{\"version\":1}\n" },
+    { "input": "create LICENSE",     "operationType": "write_file", "targetFiles": ["LICENSE"],     "content": "MIT\n" },
+    { "input": "create CONTRIBUTING.md", "operationType": "write_file", "targetFiles": ["CONTRIBUTING.md"], "content": "# Contributing\n" }
+  ]
+}
