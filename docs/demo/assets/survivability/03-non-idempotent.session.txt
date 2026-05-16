@@ -1,0 +1,168 @@
+$ # Spec has a run_command (non-idempotent) followed by a write_file.
+$ usesteady run docs/demo/survivability/specs/03-non-idempotent.json --yes
+
+Loaded spec: "non-idempotent" (2 task(s))
+  Workspace:   <WS>
+
+----------------------------------------------------
+  REVIEW  "non-idempotent"  -  2 tasks
+----------------------------------------------------
+
+    1. [cursor] run build
+       Command: "echo built"
+    -----
+    2. [cursor] create DEPLOY.md
+       Target:  DEPLOY.md
+       Content: "# Deploy\n\nDeployment instructions.\n"
+
+
+----------------------------------------------------
+  APPROVE?  Task 1 of 2
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 1: Run command "echo built"
+  You asked:  run build
+  Preview:
+    Operation: run (executes a shell command)
+    Command:   "echo built"
+
+
+----------------------------------------------------
+  APPROVE?  Task 2 of 2
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 2: Create file DEPLOY.md
+  Previous: [done]  run build
+  You asked:  create DEPLOY.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    DEPLOY.md
+    Content (4 lines, 35 chars):
+      | # Deploy
+      |
+      | Deployment instructions.
+      |
+    File note: If DEPLOY.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  COMPLETED
+----------------------------------------------------
+  Workflow "non-idempotent" completed.
+  Tasks:
+    [done] run build
+    [done] create DEPLOY.md
+
+
+  ok Completed successfully
+  Steps: 2 / 2
+
+
+  Goodbye.
+
+$ ls <WS>
+  [f]  DEPLOY.md             35B
+
+$ # === Simulate interruption after task 1/2 (the run_command) ===
+$ ls <WS>
+  (empty)
+
+$ # Resume WITHOUT --reexecute-non-idempotent: REFUSED.
+$ usesteady run docs/demo/survivability/specs/03-non-idempotent.json \
+    --yes --resume-from <WS>/.usesteady/resume-tokens/<id>.json
+
+Loaded spec: "non-idempotent" (2 task(s))
+  Workspace:   <WS>
+
+   Resume refused: 1 task(s) cannot be idempotency-checked.
+    The workflow includes non-idempotent ops (append/prepend/replace/run/claude).
+    Pass --reexecute-non-idempotent to opt in to re-prompting on those tasks.
+    Run `usesteady workflow resume-info` for the full per-task report.
+
+
+  Goodbye.
+
+
+$ # resume-info explains why:
+Resume token: sha256:a1c382fb49eff235
+  Workflow:     non-idempotent
+  Run ID:       93fee386f1ed0f65
+  Completed:    1/2
+  Workspace:    <WS>
+
+  Verification report
+    already_done:        0
+    requires_reconfirm:  1
+    previously_skipped:  0
+    diverged:            0
+    aggregate:           needs_reconfirm
+
+  Per-task verdicts
+    [?  ] task[0] run_command   run build
+          → requires_reconfirm: op type "run_command" is not idempotency-checkable; operator must confirm
+
+  No execution occurred. No tasks ran. No workspace changes.
+
+$ # Resume WITH the explicit opt-in: proceeds.
+$ usesteady run docs/demo/survivability/specs/03-non-idempotent.json \
+    --yes --resume-from <WS>/.usesteady/resume-tokens/<id>.json \
+    --reexecute-non-idempotent
+
+Loaded spec: "non-idempotent" (2 task(s))
+  Workspace:   <WS>
+
+  Resuming workflow "non-idempotent".
+    Token:      sha256:a1c382fb49eff235
+    Completed:  1/2 (verified already-done)
+    Remaining:  1 task(s)
+
+
+----------------------------------------------------
+  REVIEW  "non-idempotent"  -  2 tasks
+----------------------------------------------------
+
+    1. [cursor] run build
+       Command: "echo built"
+    -----
+    2. [cursor] create DEPLOY.md
+       Target:  DEPLOY.md
+       Content: "# Deploy\n\nDeployment instructions.\n"
+
+
+----------------------------------------------------
+  APPROVE?  Task 2 of 2
+----------------------------------------------------
+  SYSTEM WILL
+  -> Task 2: Create file DEPLOY.md
+  Previous: [done]  run build
+  You asked:  create DEPLOY.md
+  Preview:
+    Operation: create (writes a new file)
+    Target:    DEPLOY.md
+    Content (4 lines, 35 chars):
+      | # Deploy
+      |
+      | Deployment instructions.
+      |
+    File note: If DEPLOY.md already exists, the operation will fail (target_exists).
+
+
+----------------------------------------------------
+  COMPLETED
+----------------------------------------------------
+  Workflow "non-idempotent" completed.
+  Tasks:
+    [done] run build
+    [done] create DEPLOY.md
+
+
+  ok Completed successfully
+  Steps: 2 / 2
+
+
+  Goodbye.
+
+$ ls <WS>
+  [f]  DEPLOY.md             35B
+
+$ # Exit: initial=0, refused=1, accepted=0

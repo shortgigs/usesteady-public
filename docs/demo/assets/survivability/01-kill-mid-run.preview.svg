@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1018 724" width="1018" height="724" role="img" aria-label="usesteady: kill mid-run → resume — preview frame">
+  <title>usesteady: kill mid-run → resume — preview frame</title>
+  <desc>UseSteady survivability demo: 01-kill-mid-run — static preview SVG showing the key moment ("Resuming workflow").</desc>
+  <rect width="100%" height="100%" rx="10" ry="10" fill="#0a0a0a" stroke="#1c1c1c" stroke-width="1" />
+  <rect width="100%" height="32" rx="10" ry="10" fill="#161616" />
+  <rect y="22" width="100%" height="10" fill="#161616" />
+  <line x1="0" y1="32" x2="1018" y2="32" stroke="#222222" stroke-width="1" />
+  <circle cx="20" cy="16" r="6" fill="#ff5f56" />
+  <circle cx="40" cy="16" r="6" fill="#ffbd2e" />
+  <circle cx="60" cy="16" r="6" fill="#27c93f" />
+  <text x="80" y="20" fill="#666666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">usesteady: kill mid-run → resume — preview</text>
+  <text x="14" y="72" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="90" fill="#00d4fa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ ls &lt;WS&gt;</text>
+  <text x="14" y="108" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">  [f]  orders.md             37B</text>
+  <text x="14" y="126" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">  [f]  users.md              35B</text>
+  <text x="14" y="144" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="162" fill="#666666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ # The visible resume token:</text>
+  <text x="14" y="180" fill="#00d4fa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ cat &lt;WS&gt;/.usesteady/resume-tokens/&lt;id&gt;.json</text>
+  <text x="14" y="198" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">{&quot;format&quot;:&quot;usesteady.resume-token.v1&quot;,&quot;workflow_run_id&quot;:&quot;c5bd5fc3d8f8e76d&quot;,&quot;workflow_name&quot;:&quot;kill-mid-run&quot;,&quot;wo…</text>
+  <text x="14" y="216" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="234" fill="#666666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ # Resume from the token. No hidden state; just point at the file.</text>
+  <text x="14" y="252" fill="#00d4fa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">$ usesteady run docs/demo/survivability/specs/01-kill-mid-run.json \</text>
+  <text x="14" y="270" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    --yes --resume-from &lt;WS&gt;/.usesteady/resume-tokens/&lt;id&gt;.json</text>
+  <text x="14" y="288" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="306" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">Loaded spec: &quot;kill-mid-run&quot; (4 task(s))</text>
+  <text x="14" y="324" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">  Workspace:   &lt;WS&gt;</text>
+  <text x="14" y="342" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="360" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">  Resuming workflow &quot;kill-mid-run&quot;.</text>
+  <text x="14" y="378" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    Token:      sha256:850ff5c050dc1796</text>
+  <text x="14" y="396" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    Completed:  2/4 (verified already-done)</text>
+  <text x="14" y="414" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    Remaining:  2 task(s)</text>
+  <text x="14" y="432" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="450" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="468" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">----------------------------------------------------</text>
+  <text x="14" y="486" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">  REVIEW  &quot;kill-mid-run&quot;  -  4 tasks</text>
+  <text x="14" y="504" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">----------------------------------------------------</text>
+  <text x="14" y="522" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve"> </text>
+  <text x="14" y="540" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    1. [cursor] create users.md</text>
+  <text x="14" y="558" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Target:  users.md</text>
+  <text x="14" y="576" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Content: &quot;# Users\n\nUser model documentation.\n&quot;</text>
+  <text x="14" y="594" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    -----</text>
+  <text x="14" y="612" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    2. [cursor] create orders.md</text>
+  <text x="14" y="630" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Target:  orders.md</text>
+  <text x="14" y="648" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Content: &quot;# Orders\n\nOrder model documentation.\n&quot;</text>
+  <text x="14" y="666" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    -----</text>
+  <text x="14" y="684" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">    3. [cursor] create reports.md</text>
+  <text x="14" y="702" fill="#d4d4d4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" xml:space="preserve">       Target:  reports.md</text>
+</svg>

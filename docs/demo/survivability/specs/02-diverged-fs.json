@@ -1,0 +1,7 @@
+{
+  "name": "diverged-fs",
+  "tasks": [
+    { "input": "create CHANGELOG.md", "operationType": "write_file", "targetFiles": ["CHANGELOG.md"], "content": "# Changelog\n\n## v0.1.0\n\n- initial release\n" },
+    { "input": "create VERSION",      "operationType": "write_file", "targetFiles": ["VERSION"],      "content": "0.1.0\n" }
+  ]
+}

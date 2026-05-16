@@ -1,0 +1,7 @@
+{
+  "name": "non-idempotent",
+  "tasks": [
+    { "input": "run build",         "operationType": "run_command", "command": "echo built" },
+    { "input": "create DEPLOY.md",  "operationType": "write_file",  "targetFiles": ["DEPLOY.md"],  "content": "# Deploy\n\nDeployment instructions.\n" }
+  ]
+}
