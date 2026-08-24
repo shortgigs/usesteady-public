@@ -1,6 +1,6 @@
 # Demo 01 — Kill mid-run → resume
 
-> **Proves:** workflow survivability — long workflows can be interrupted and resumed without losing progress.
+> **Shows:** workflow survivability — long workflows can be interrupted and resumed without losing progress.
 
 <p align="center">
   <a href="../assets/survivability/01-kill-mid-run.svg">

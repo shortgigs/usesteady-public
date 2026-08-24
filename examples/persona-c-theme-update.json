@@ -1,0 +1,39 @@
+{
+  "_comment": "Persona C — Scope Navigator. 5-step design token rename with mixed explicit and inferred scope. Steps 1, 2, 4 carry targetFiles (no scope prompt expected). Steps 3, 5 have no targetFiles (scope prompt expected). Adapt to your repo.",
+  "name": "persona-c-theme-update",
+  "defaultRuntime": "cursor",
+  "maxRetries": 2,
+  "tasks": [
+    {
+      "label": "Update token definition",
+      "input": "in src/tokens/colors.ts rename the token 'primary-500' to 'brand-600' — update both the key name and any comments that reference it",
+      "targetFiles": ["src/tokens/colors.ts"],
+      "_note": "Explicit targetFiles. Expect no scope prompt."
+    },
+    {
+      "label": "Update Button component class",
+      "input": "in src/components/Button.tsx replace any className string or Tailwind class that references 'primary-500' with 'brand-600'",
+      "targetFiles": ["src/components/Button.tsx"],
+      "_note": "Explicit targetFiles. Expect no scope prompt."
+    },
+    {
+      "label": "Update Tailwind config",
+      "input": "in the Tailwind config file add a 'brand' color scale that maps brand-600 to the hex value previously used for primary-500 — the config file is typically tailwind.config.js or tailwind.config.ts at the project root",
+      "_note": "No targetFiles. Expect scope prompt with candidates. Observation: is the config file findable in the candidate list? Does the reviewer select it confidently?"
+    },
+    {
+      "label": "Update Storybook stories",
+      "input": "in the Storybook story files for Button and Badge replace all occurrences of 'primary-500' with 'brand-600' in className strings and documentation strings",
+      "targetFiles": [
+        "src/stories/Button.stories.tsx",
+        "src/stories/Badge.stories.tsx"
+      ],
+      "_note": "Multiple explicit targetFiles. Expect no scope prompt. Observation: does multi-file targetFiles feel natural?"
+    },
+    {
+      "label": "Update global CSS variables",
+      "input": "in the global CSS file replace the CSS custom property '--color-primary-500' with '--color-brand-600' and update its value if needed",
+      "_note": "No targetFiles. Global CSS could be src/index.css, src/styles/global.css, or similar. Expect scope prompt. Observation: is the candidate list helpful when the file name is ambiguous?"
+    }
+  ]
+}

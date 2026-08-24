@@ -1,6 +1,6 @@
 # Demo 03 — Non-idempotent task → re-prompt / refusal
 
-> **Proves:** authority discipline. Resume across a non-idempotent task requires an explicit operator opt-in (`--reexecute-non-idempotent`). It is never silent.
+> **Shows:** authority discipline. Resume across a non-idempotent task requires an explicit operator opt-in (`--reexecute-non-idempotent`). It is never silent.
 
 <p align="center">
   <a href="../assets/survivability/03-non-idempotent.svg">

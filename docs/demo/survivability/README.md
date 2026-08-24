@@ -1,13 +1,13 @@
 # UseSteady — Survivability Demo Suite
 
 > Inspect workflows before execution.
-> Survive interruption without hidden continuation.
+> Resume from a visible token. A previous run's approvals do not transfer.
 
-This directory contains four canonical demos that prove what "survivability without hidden continuation" looks like operationally. Each demo runs in under 60 seconds. Each one is reproducible byte-for-byte from a deterministic capture script (`scripts/p2-survivability-capture.mjs` in the engine repository); the captured assets shipped here are the output bytes.
+This directory contains four canonical demos that illustrate survivability without hidden continuation. Each demo runs in under 60 seconds. Committed capture assets live under [`../assets/survivability/`](../assets/survivability/).
 
 ## The four demos
 
-| # | Demo | Proves | Walkthrough | Animated SVG | Asciicast | Preview |
+| # | Demo | Shows | Walkthrough | Animated SVG | Asciicast | Preview |
 |---|------|--------|-------------|--------------|-----------|---------|
 | 01 | Kill mid-run → resume | Workflow survivability | [01-kill-mid-run.md](01-kill-mid-run.md) | [.svg](../assets/survivability/01-kill-mid-run.svg) | [.cast](../assets/survivability/01-kill-mid-run.cast) | [.preview.svg](../assets/survivability/01-kill-mid-run.preview.svg) |
 | 02 | Diverged filesystem → refusal | Integrity | [02-diverged-fs.md](02-diverged-fs.md) | [.svg](../assets/survivability/02-diverged-fs.svg) | [.cast](../assets/survivability/02-diverged-fs.cast) | [.preview.svg](../assets/survivability/02-diverged-fs.preview.svg) |

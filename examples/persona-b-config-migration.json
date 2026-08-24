@@ -1,0 +1,40 @@
+{
+  "_comment": "Persona B — Failure Scenario. 6-step config migration with deliberate stress points: one auto-skipped step, one likely delivery failure, retry/skip decision points. Adapt to your repo.",
+  "name": "persona-b-config-migration",
+  "defaultRuntime": "cursor",
+  "maxRetries": 3,
+  "tasks": [
+    {
+      "label": "Audit current config structure",
+      "input": "list all top-level keys in src/config/app.config.ts and their types — read only, no changes",
+      "_note": "Intentionally a read task. Expect not_execute (auto-skipped). Observation: does the reviewer understand why it was skipped?"
+    },
+    {
+      "label": "Create auth config file",
+      "input": "create a new file src/config/auth.config.ts and move all auth-related configuration keys (any key whose name contains 'auth', 'token', 'session', or 'jwt') from src/config/app.config.ts into it, exporting them under the same names",
+      "targetFiles": ["src/config/app.config.ts"]
+    },
+    {
+      "label": "Update AuthProvider import",
+      "input": "in src/auth/AuthProvider.tsx update the import of auth config keys to come from src/config/auth.config.ts instead of src/config/app.config.ts",
+      "targetFiles": ["src/auth/AuthProvider.tsx"]
+    },
+    {
+      "label": "Update auth middleware import",
+      "input": "in src/middleware/authMiddleware.ts update any import of auth config values to use src/config/auth.config.ts instead of src/config/app.config.ts",
+      "targetFiles": ["src/middleware/authMiddleware.ts"],
+      "_note": "If authMiddleware.ts does not exist, this step will fail. Observation: is the failure note actionable? Does the reviewer reach for retry or skip?"
+    },
+    {
+      "label": "Remove moved keys from app config",
+      "input": "in src/config/app.config.ts remove all auth-related keys that were moved to auth.config.ts — the keys whose names contain 'auth', 'token', 'session', or 'jwt'",
+      "targetFiles": ["src/config/app.config.ts"]
+    },
+    {
+      "label": "Re-export from config barrel",
+      "input": "in src/config/index.ts add an export of all named exports from './auth.config'",
+      "targetFiles": ["src/config/index.ts"],
+      "_note": "If index.ts does not exist in config, this step will fail or need to be adapted. Observation: retry vs. skip decision."
+    }
+  ]
+}

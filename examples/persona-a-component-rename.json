@@ -1,0 +1,47 @@
+{
+  "_comment": "Persona A — Structured Refactorer. 8-step component rename. Adapt task inputs and targetFiles to your repo before running.",
+  "name": "persona-a-component-rename",
+  "defaultRuntime": "cursor",
+  "maxRetries": 2,
+  "tasks": [
+    {
+      "label": "Rename component file",
+      "input": "rename the file src/components/Button.tsx to src/components/PrimaryAction.tsx",
+      "targetFiles": ["src/components/Button.tsx"]
+    },
+    {
+      "label": "Update component declaration",
+      "input": "rename the React component from 'Button' to 'PrimaryAction' inside src/components/PrimaryAction.tsx — update the function/const name and any internal self-references",
+      "targetFiles": ["src/components/PrimaryAction.tsx"]
+    },
+    {
+      "label": "Update named export",
+      "input": "update the named export in src/components/PrimaryAction.tsx from 'export const Button' or 'export function Button' to 'export const PrimaryAction' or 'export function PrimaryAction'",
+      "targetFiles": ["src/components/PrimaryAction.tsx"]
+    },
+    {
+      "label": "Update barrel index",
+      "input": "in src/components/index.ts replace the export of Button from './Button' with an export of PrimaryAction from './PrimaryAction'",
+      "targetFiles": ["src/components/index.ts"]
+    },
+    {
+      "label": "Update import in App",
+      "input": "in src/App.tsx replace the import of Button from './components/Button' or './components' with an import of PrimaryAction from the updated path",
+      "targetFiles": ["src/App.tsx"]
+    },
+    {
+      "label": "Update JSX usage in App",
+      "input": "in src/App.tsx replace all occurrences of <Button with <PrimaryAction and </Button> with </PrimaryAction>",
+      "targetFiles": ["src/App.tsx"]
+    },
+    {
+      "label": "Update test file import",
+      "input": "in src/__tests__/App.test.tsx replace the import of Button with an import of PrimaryAction from the updated component path",
+      "targetFiles": ["src/__tests__/App.test.tsx"]
+    },
+    {
+      "label": "Update test assertions and snapshots",
+      "input": "in src/__tests__/App.test.tsx and any snapshot files under src/__tests__/__snapshots__/ replace all string occurrences of 'Button' with 'PrimaryAction' where they refer to the component name"
+    }
+  ]
+}

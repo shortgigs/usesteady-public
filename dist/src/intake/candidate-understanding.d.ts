@@ -1,0 +1,49 @@
+/**
+ * Candidate understanding — AI_SEAMS_V1 seam 1 (L2.S2).
+ *
+ * When the deterministic parser has ALREADY failed on an input, this module
+ * asks the LLM classifier for a candidate understanding ("I think you want…")
+ * that a human can confirm, correct, or decline. It is the packaging layer
+ * between `classifyIntent` and the CLI confirmation gate.
+ *
+ * ── Contract (docs/ai-seams-v1-contract.md) ──────────────────────────────────
+ *
+ *   INV-AI-1  Callers may consult this ONLY after the deterministic parser
+ *             returned an error. This module never runs first.
+ *
+ *   INV-AI-2  The returned candidate is advisory. It carries text for a human
+ *             to confirm — it is never executed, never rendered as SYSTEM WILL,
+ *             and never self-promotes. Confirmation happens at the caller's
+ *             existing human gate, and the confirmed text re-enters the FULL
+ *             deterministic pipeline (safety gate included) from the top.
+ *
+ *   INV-AI-3  Fail-closed: no API key, API failure, no rewrite, or a rewrite
+ *             the deterministic parser cannot parse → null. The caller must
+ *             treat null as "behave exactly as before this seam existed."
+ *
+ *   INV-AI-6  Execution never widens: a candidate is returned ONLY when its
+ *             rewrite parses deterministically (`normalizeNLToIR` → ok). The
+ *             model cannot introduce an operation the frozen parser would not
+ *             itself accept.
+ */
+import { classifyIntent } from "./llm-classifier.js";
+import type { IntentFamily } from "./intent-families.js";
+export type CandidateUnderstanding = {
+    /** The model's proposed rewrite — guaranteed deterministically parseable. */
+    readonly rewrite: string;
+    /** Classified intent family (direct-capable by construction — guided-only families never carry a rewrite). */
+    readonly family: IntentFamily;
+    /** Model confidence, clamped to [0, 1] by the classifier's validator. */
+    readonly confidence: number;
+    /** The verbatim input the candidate was derived from. */
+    readonly originalInput: string;
+};
+/** Injectable for tests only; production callers use the default. */
+export type ClassifyFn = typeof classifyIntent;
+/**
+ * Propose a candidate understanding for an input the deterministic parser
+ * rejected. Returns null on every failure path (INV-AI-3) — the caller falls
+ * back to today's deterministic recovery behavior.
+ */
+export declare function proposeCandidateUnderstanding(input: string, classify?: ClassifyFn): Promise<CandidateUnderstanding | null>;
+//# sourceMappingURL=candidate-understanding.d.ts.map

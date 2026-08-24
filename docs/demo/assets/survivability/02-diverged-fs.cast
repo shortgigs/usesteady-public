@@ -1,4 +1,4 @@
-{"version":2,"width":110,"height":36,"timestamp":0,"title":"usesteady: diverged filesystem → refusal","env":{"SHELL":"/bin/sh","TERM":"xterm-256color"}}
+{"version":2,"width":110,"height":36,"timestamp":0,"title":"usesteady: diverged filesystem -> refusal","env":{"SHELL":"/bin/sh","TERM":"xterm-256color"}}
 [0.08,"o","$ # Initial run completes both tasks.\r\n"]
 [0.16,"o","$ usesteady run docs/demo/survivability/specs/02-diverged-fs.json --yes\r\n"]
 [0.24,"o","\r\n"]
@@ -86,7 +86,7 @@
 [6.8,"o","\r\n"]
 [6.88,"o","   Resume refused: workspace state diverged from token.\r\n"]
 [6.96,"o","    1 task(s) cannot be verified as already-done.\r\n"]
-[7.04,"o","    Run `usesteady workflow resume-info <WS>/.usesteady/resume-tokens/028f4bb91f76453f.json --spec <spec.json…\r\n"]
+[7.04,"o","    Run `usesteady workflow resume-info <WS>/.usesteady/resume-tokens/028f4bb91f76453f.json --spec <spec.js...\r\n"]
 [7.12,"o","\r\n"]
 [7.2,"o","\r\n"]
 [7.28,"o","  Goodbye.\r\n"]

@@ -1,0 +1,37 @@
+{
+  "name": "refactor-button-component",
+  "defaultRuntime": "cursor",
+  "maxRetries": 2,
+  "tasks": [
+    {
+      "label": "Rename Button component file",
+      "input": "rename src/components/Button.tsx to src/components/PrimaryButton.tsx",
+      "runtime": "cursor"
+    },
+    {
+      "label": "Update Button import in App.tsx",
+      "input": "replace 'import Button from \"./components/Button\"' with 'import PrimaryButton from \"./components/PrimaryButton\"' in src/App.tsx first occurrence",
+      "runtime": "cursor"
+    },
+    {
+      "label": "Replace opening Button tag in App.tsx",
+      "input": "replace '<Button' with '<PrimaryButton' in src/App.tsx first occurrence",
+      "runtime": "cursor"
+    },
+    {
+      "label": "Replace closing Button tag in App.tsx",
+      "input": "replace '</Button>' with '</PrimaryButton>' in src/App.tsx first occurrence",
+      "runtime": "cursor"
+    },
+    {
+      "label": "Update button variant prop",
+      "input": "replace 'variant=\"primary\"' with 'variant=\"brand\"' in src/App.tsx first occurrence",
+      "runtime": "cursor"
+    },
+    {
+      "label": "Update test file import",
+      "input": "replace 'import Button from \"./Button\"' with 'import PrimaryButton from \"./PrimaryButton\"' in src/components/Button.test.tsx first occurrence",
+      "runtime": "cursor"
+    }
+  ]
+}

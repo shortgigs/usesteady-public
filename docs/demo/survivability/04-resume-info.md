@@ -1,6 +1,6 @@
 # Demo 04 — `workflow resume-info` inspection
 
-> **Proves:** visibility. A resume token can be fully inspected, validated, and verified without executing anything.
+> **Shows:** visibility. A resume token can be fully inspected, validated, and verified without executing anything.
 
 <p align="center">
   <a href="../assets/survivability/04-resume-info.svg">

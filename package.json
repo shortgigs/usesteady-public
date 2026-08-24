@@ -1,0 +1,66 @@
+{
+  "name": "usesteady",
+  "version": "0.1.0-alpha.72",
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Inspect workflows before execution. UseSteady inspects a workflow, shows the exact SYSTEM WILL operation, and waits for approval before each interactive step. Resume from a visible token without inheriting prior approval.",
+  "homepage": "https://usesteady.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shortgigs/usesteady-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shortgigs/usesteady-public/issues"
+  },
+  "keywords": [
+    "ai-workflow",
+    "workflow-runner",
+    "workflow-inspection",
+    "resume-token",
+    "human-in-the-loop",
+    "approval-gate",
+    "survivable-execution",
+    "developer-cli",
+    "ci-cd",
+    "long-running-workflows"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "main": "./dist/src/shell/cli/use-steady.js",
+  "types": "./dist/src/shell/cli/use-steady.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/shell/cli/use-steady.d.ts",
+      "default": "./dist/src/shell/cli/use-steady.js"
+    }
+  },
+  "bin": {
+    "usesteady": "./bin/use-steady.js"
+  },
+  "files": [
+    "dist/",
+    "bin/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "usesteady": "node ./bin/use-steady.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.88.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.8.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.3.2",
+    "ink": "^7.0.0",
+    "openai": "^6.34.0",
+    "posthog-node": "^5.29.2",
+    "react": "^19.2.5",
+    "resend": "^6.12.0"
+  }
+}

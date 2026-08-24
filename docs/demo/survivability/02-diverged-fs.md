@@ -1,6 +1,6 @@
 # Demo 02 — Diverged filesystem → refusal
 
-> **Proves:** integrity. The resume path verifies its "already-done" claims against current disk state and refuses on inconsistency.
+> **Shows:** integrity. The resume path verifies its "already-done" claims against current disk state and refuses on inconsistency.
 
 <p align="center">
   <a href="../assets/survivability/02-diverged-fs.svg">

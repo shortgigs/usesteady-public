@@ -27,7 +27,7 @@ covers every operational claim the wedge makes:
 
 ## Storyboard
 
-| Beat | Visible moment | What it proves | Approx. timing |
+| Beat | Visible moment | What it shows | Approx. timing |
 |------|----------------|----------------|----------------|
 | 1 | `usesteady workflow inspect spec.json --workspace-root <WS>` shows the 4-task plan and target tree | **Inspect before execution.** No LLM, no writes, no approval prompt. | 0 - 15s |
 | 2 | `usesteady run spec.json <WS> --yes` starts; killed after task 2/4 | **Operator-approved run.** Approval is given by inspecting first; `--yes` proceeds. | 15 - 30s |
@@ -36,9 +36,9 @@ covers every operational claim the wedge makes:
 | 5 | `usesteady run spec.json <WS> --yes --resume-from <token>` completes tasks 3 and 4; tasks 1 and 2 re-verified, not re-executed | **Resume without inherited authority.** Each "already-done" claim is checked against current disk state. | 60 - 80s |
 
 
-## What this demo proves (and what it does NOT)
+## What this demo shows (and what it does NOT)
 
-Proves:
+Shows:
 
 - **Inspect before execution** -- the plan is fully readable before approval.
 - **Operator-driven execution** -- approval is required up front, not assumed.
@@ -47,7 +47,7 @@ Proves:
 - **Verification before resume** -- `workflow resume-info` is read-only;
   the resume path itself re-verifies every "already-done" claim.
 
-Does NOT prove (and does NOT pretend to):
+Does NOT show (and does NOT pretend to):
 
 - Anything about LLM-generated content quality (the spec is hand-authored).
 - Autonomous continuation (there isn't any; every step is explicitly invoked).
@@ -67,14 +67,14 @@ node scripts/p2-hero-capture.mjs
 node scripts/p2-render-demo-assets.mjs
 ```
 
-No dependencies beyond Node 18+ and the local UseSteady CLI. No network, no LLM,
-no telemetry. The capture script normalizes workspace paths to `<WS>` and
-ASCII-folds glyphs so the session is byte-stable across machines.
+No dependencies beyond Node 18+ and the local UseSteady CLI. The capture script
+does not require a network or an LLM. It normalizes workspace paths to `<WS>` and
+ASCII-folds glyphs so those scripted captures render the same on any host.
 
 
 ## Why this is the canonical "developer reality" flow
 
-The four survivability demos in `docs/demo/survivability/` each prove **one**
+The four survivability demos in `docs/demo/survivability/` each illustrate **one**
 property in isolation: kill mid-run, diverged filesystem, non-idempotent
 re-prompt, resume-info inspection.
 

@@ -1,0 +1,35 @@
+UseSteady
+Copyright 2026 Shortgigs LLC
+
+This product is licensed under the Apache License, Version 2.0.
+See the LICENSE file for the full license text.
+
+---
+
+Open Core Notice
+----------------
+
+The core workflow engine, CLI, React UI, and friction-capture module in
+this repository are open source under Apache 2.0.
+
+The following components are proprietary to Shortgigs LLC and are NOT
+included in this repository:
+
+  - Admin review CLI (usesteady admin friction)
+  - Payout processing integration
+  - Friction report collection backend and storage
+  - Any premium or enterprise features
+
+These components are maintained in a separate private repository and are
+not available under any open source license.
+
+---
+
+Contributor License Agreement
+------------------------------
+
+Contributions to this repository are subject to the Shortgigs LLC
+Contributor License Agreement (CLA). See CLA.md for details.
+
+By submitting a pull request you confirm that you have read and agree
+to the terms of the CLA.

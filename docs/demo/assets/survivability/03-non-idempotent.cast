@@ -1,4 +1,4 @@
-{"version":2,"width":110,"height":36,"timestamp":0,"title":"usesteady: non-idempotent → re-prompt","env":{"SHELL":"/bin/sh","TERM":"xterm-256color"}}
+{"version":2,"width":110,"height":36,"timestamp":0,"title":"usesteady: non-idempotent -> re-prompt","env":{"SHELL":"/bin/sh","TERM":"xterm-256color"}}
 [0.08,"o","$ # Spec has a run_command (non-idempotent) followed by a write_file.\r\n"]
 [0.16,"o","$ usesteady run docs/demo/survivability/specs/03-non-idempotent.json --yes\r\n"]
 [0.24,"o","\r\n"]
