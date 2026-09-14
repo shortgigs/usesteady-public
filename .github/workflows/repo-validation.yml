@@ -1,0 +1,31 @@
+name: Repo validation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  repo-validation:
+    name: Repo validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate minimal repository shape
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f README.md
+          test -s README.md
+
+      - name: Fail on unresolved merge markers
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git grep -n -E '^(<<<<<<<|=======|>>>>>>>)' -- . >/dev/null; then
+            echo "Unresolved merge conflict markers found."
+            exit 1
+          fi
