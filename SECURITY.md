@@ -1,20 +1,28 @@
 # Security
 
-## Security notice - Windows junction/reparse paths
+## Windows junction/reparse containment
 
-usesteady@0.1.0-alpha.72 has a known containment issue on Windows when a path inside the workspace traverses a junction/reparse point to a location outside the workspace.
+`usesteady@0.1.0-alpha.72` is an affected historical release. On Windows, an approved filesystem mutation can traverse a junction/reparse point from an apparent in-workspace path to a location outside the workspace.
 
-UseSteady may display the apparent in-workspace path in SYSTEM WILL while the filesystem operation resolves outside the workspace.
+`usesteady@0.1.0-alpha.73` is now available as the hardened successor for this specific issue. The `alpha` npm dist-tag resolves to `0.1.0-alpha.73`.
 
-Until a hardened release is available:
+Upgrade with:
+
+```bash
+npm install -g usesteady@alpha
+```
+
+For `0.1.0-alpha.72`:
 
 - do not use mutation commands on untrusted Windows repositories or workspaces containing junctions/reparse points;
 - inspect/remove unexpected junctions before approving filesystem mutations;
-- use .72 only in workspaces whose filesystem topology you control.
+- treat `.72` as affected even though the interactive approval gate still applies.
 
-This issue does not bypass the interactive approval gate. It affects where an approved filesystem operation may ultimately land.
+The issue in `.72` does not bypass the interactive approval gate. It affects where an approved filesystem operation may ultimately land.
 
-The released .72 artifact remains the object under independent review. We are not replacing it with an older version while the review is in progress.
+The `.73` successor was released only after Windows junction/reparse containment regression, cross-platform effect-decision checks, exact-package verification, and clean Linux/Windows installation proof completed. This is a claim about the tested containment issue and release evidence, not a universal filesystem-security or Production-readiness guarantee.
+
+`0.1.0-alpha.72` remains documented as affected; publishing `.73` does not retroactively change `.72`.
 
 ## Report a vulnerability
 
