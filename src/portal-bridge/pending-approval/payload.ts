@@ -1,0 +1,638 @@
+/**
+ * Pending Approval Bridge (PENDING_APPROVAL_BRIDGE_LANE_A_V1) - pure payload
+ * builder + validator for the Core -> Portal emit.
+ *
+ * Direction: Core -> Portal `POST /api/v1/pending-approvals` when a run reaches a
+ * pre-execution approval gate. This module owns the frozen `ucp.pending_approval.v1`
+ * wire shape and is PURE: no network, no filesystem, no clock, no env reads. The
+ * opt-in resolution, the HTTPS POST, and the gate hook are later PRs - kept out of
+ * this unit so the wire shape can be tested in isolation (mirrors the sibling
+ * EXECUTION_RETURN_BRIDGE_V1 build-payload module).
+ *
+ * Authority: this bridge is a remote INPUT to Core's existing approval gate, never
+ * a new authority and never an executor (INV-LA-AUTH1/AUTH4). Building a payload
+ * publishes "a gate is open"; it does not run, approve, or skip anything.
+ *
+ * Privacy (INV-PAB-P2 / INV-LA-EMIT1): there is deliberately NO field for file
+ * contents or diffs. The type system itself prevents content from reaching the
+ * wire - only a SYSTEM WILL summary, resource paths + change-types, counts, and a
+ * risk band exist here. Resources are assumed already redacted on the machine
+ * before they reach this builder.
+ *
+ * Evolution: additive only (new OPTIONAL fields). Any breaking change requires a
+ * new schema id `ucp.pending_approval.v2` and a v2 contract - never an in-place
+ * edit of these types.
+ *
+ * Frozen wire contract: PENDING_APPROVAL_BRIDGE_V1
+ * (docs/product/pending-approval-bridge-contract-v1.md, authored in usesteady-ops).
+ */
+
+/** Frozen schema discriminator. Literal type - any other value is a bug. */
+export const PENDING_APPROVAL_SCHEMA = "ucp.pending_approval.v1" as const;
+
+/**
+ * Recommended cap on `affected_resources` entries (contract "Bounds & rules").
+ * When a gate touches more than this, the payload carries the first N and sets
+ * `affected_resources_truncated: true` with the true count in
+ * `affected_resources_total`. Defined locally (not imported from the return
+ * bridge) so the two bridges stay independent; the contract recommends 200 for
+ * each. Matches the Lane B (Portal) cap of the same name.
+ */
+export const PENDING_AFFECTED_RESOURCES_LIMIT = 200;
+
+export type PendingApprovalRisk = "low" | "medium" | "high";
+export type PendingActionType = "create" | "update" | "delete" | "rename" | "other";
+export type ResourceChangeType = "create" | "update" | "delete" | "rename";
+
+// ─── Model advisory carriage (P3 Phase 2) ─────────────────────────────────────
+
+/** Closed enum of structured model advisory kinds (Core-stamped, model-selected). */
+export type PendingModelAdvisoryKind =
+  | "warning"
+  | "recommend_against"
+  | "uncertainty"
+  | "alternative";
+
+export const PENDING_MODEL_ADVISORY_KINDS: readonly PendingModelAdvisoryKind[] = [
+  "warning",
+  "recommend_against",
+  "uncertainty",
+  "alternative",
+];
+
+/** Max advisory positions carried on one gate. */
+export const PENDING_MODEL_ADVISORIES_LIMIT = 8;
+/** Max characters per advisory explanation on the wire. */
+export const PENDING_MODEL_ADVISORY_EXPLANATION_LIMIT = 4000;
+
+// ─── Evidence-basis carriage (P4) ─────────────────────────────────────────────
+
+/**
+ * Closed availability vocabulary for one evidence source on the wire. Mirrors
+ * src/evidence-basis/types.ts (Core) — duplicated here so the bridge stays
+ * dependency-free; the two MUST NOT drift apart.
+ */
+export const PENDING_EVIDENCE_AVAILABILITY = [
+  "available_and_corresponded",
+  "not_provided",
+  "partial",
+  "retrieval_failed",
+  "correspondence_not_established",
+  "unknown",
+] as const;
+export type PendingEvidenceAvailability = (typeof PENDING_EVIDENCE_AVAILABILITY)[number];
+
+/** Max evidence sources carried per advisory. */
+export const PENDING_EVIDENCE_SOURCES_LIMIT = 8;
+/** Max characters per evidence-source detail note on the wire. */
+export const PENDING_EVIDENCE_DETAIL_LIMIT = 280;
+
+/**
+ * One evidence source and its system-established availability (wire shape).
+ * `detail` is a short factual SYSTEM note (counts, never file contents or
+ * model prose).
+ */
+export type PendingModelEvidenceBasisSource = {
+  readonly source: string;
+  readonly availability: PendingEvidenceAvailability;
+  readonly detail?: string;
+};
+
+/**
+ * The SYSTEM's factual record of what evidence basis was available to the
+ * model for one advisory position (P4). Derived from the deterministic
+ * delivery contract BEFORE the model was called — never from the model's
+ * response prose.
+ *
+ * CLAIM BOUNDARY (wire-enforced): `evidence_backed_contradiction` and
+ * `comprehension` are literal "not_established". "available_and_corresponded"
+ * asserts supply/correspondence at the application boundary only — never
+ * comprehension, reliance, or provider-side consumption. Validation fails
+ * closed on any other value: the wire cannot carry an overclaim.
+ */
+export type PendingModelEvidenceBasis = {
+  readonly derivation: "system_structural_v1";
+  readonly sources: readonly PendingModelEvidenceBasisSource[];
+  readonly evidence_backed_contradiction: "not_established";
+  readonly comprehension: "not_established";
+};
+
+/**
+ * One structured model advisory position carried on a pending-approval gate.
+ *
+ *   model_position_id — content-addressed id: hashObject over the canonical
+ *                       advisory event ({ artifactId, explanation, kind, model,
+ *                       runtime }). Identical to the value embedded in the
+ *                       persisted ucp.model_advisory.v1 payload.
+ *   position_hash     — id of the persisted ucp.model_advisory.v1 evidence
+ *                       envelope (the exact preserved record).
+ *   evidence_basis    — OPTIONAL (P4). The system-derived evidence basis for
+ *                       this position. Absent for legacy (pre-P4) advisories —
+ *                       NEVER synthesized after the fact.
+ *
+ * Advisory content is model-authored and preserved verbatim. It is displayed
+ * to the human beside SYSTEM WILL; it never decides anything (zero authority).
+ */
+export type PendingApprovalModelAdvisory = {
+  readonly model_position_id: string;
+  readonly position_hash: string;
+  readonly kind: PendingModelAdvisoryKind;
+  readonly explanation: string;
+  readonly evidence_basis?: PendingModelEvidenceBasis;
+  /**
+   * OPTIONAL (P5) — id of the persisted ucp.model_evidence_basis.v1 envelope.
+   * Named resolving evidence when the human retires this position.
+   */
+  readonly evidence_basis_id?: string;
+  readonly evidence_basis_ref?: {
+    readonly evidence_basis_id: string;
+    readonly evidence_basis_hash: string;
+  };
+};
+
+/** Path + change-type only. No contents, no diff (INV-PAB-P2). */
+export type PendingAffectedResource = {
+  readonly path: string;
+  readonly change_type: ResourceChangeType;
+};
+
+/** What WILL run if the human approves - a summary only, never file contents. */
+export type PendingApprovalSystemWill = {
+  readonly summary: string;
+  readonly action_type: PendingActionType;
+  readonly affected_resources?: readonly PendingAffectedResource[];
+  readonly affected_resources_total?: number;
+  readonly affected_resources_truncated?: boolean;
+};
+
+/**
+ * The frozen `ucp.pending_approval.v1` wire payload (Core -> Portal).
+ * Field names are snake_case to match the wire contract exactly.
+ */
+export type PendingApprovalPayloadV1 = {
+  readonly schema: typeof PENDING_APPROVAL_SCHEMA;
+  readonly run_id: string;
+  readonly step_index: number;
+  readonly ucp_root_id: string | null;
+  readonly workflow_name: string | null;
+  readonly system_will: PendingApprovalSystemWill;
+  readonly risk: PendingApprovalRisk;
+  readonly requested_by: string | null;
+  readonly requested_at: string;
+  /** Optional. Omitted from the wire when 0/absent (= no TTL). */
+  readonly ttl_seconds?: number;
+  /** Optional. Present and true only to retract an already-emitted gate. */
+  readonly withdraw?: boolean;
+  /**
+   * OPTIONAL (P3 Phase 2, additive) — structured model advisory positions
+   * attached to this gate. Present only on a re-opened gate after the model
+   * emitted advisory position(s) and the task parked for a human supersession
+   * decision. Omitted entirely for ordinary gates.
+   */
+  readonly model_advisories?: readonly PendingApprovalModelAdvisory[];
+  /**
+   * OPTIONAL (P3 Phase 2, additive) — gate emission cycle for this
+   * (run_id, step_index): 0 = the ordinary approval gate; 1+ = the gate was
+   * re-opened after model advisory episode N. Omitted when 0. The Portal keys
+   * gate identity on (organization_id, run_id, step_index, gate_cycle).
+   */
+  readonly gate_cycle?: number;
+};
+
+const RISKS: readonly PendingApprovalRisk[] = ["low", "medium", "high"];
+const ACTION_TYPES: readonly PendingActionType[] = [
+  "create",
+  "update",
+  "delete",
+  "rename",
+  "other",
+];
+const CHANGE_TYPES: readonly ResourceChangeType[] = ["create", "update", "delete", "rename"];
+
+/**
+ * Normalized, lane-internal input. Camel-case (Core convention); the builder maps
+ * it to the snake_case wire shape. Resources must already be redacted on the
+ * machine (INV-PAB-P3 / INV-LA-EMIT1) before this call.
+ */
+export type PendingApprovalInput = {
+  readonly runId: string;
+  /** 0-based gate index within the run. */
+  readonly stepIndex: number;
+  readonly ucpRootId?: string | null;
+  readonly workflowName?: string | null;
+  /** Human-readable SYSTEM WILL line - no file contents. */
+  readonly summary: string;
+  readonly actionType: PendingActionType;
+  /** Already redacted/allowlisted on the machine before this call. */
+  readonly affectedResources?: readonly PendingAffectedResource[];
+  readonly risk: PendingApprovalRisk;
+  readonly requestedBy?: string | null;
+  /** ISO-8601, Core clock (gate-open time; ordering authority - INV-PAB-I4). */
+  readonly requestedAt: string;
+  /** 0/absent/negative => no TTL (omitted from the wire). */
+  readonly ttlSeconds?: number | null;
+  /**
+   * true builds a withdraw payload that retracts a previously-emitted gate for
+   * the same `(run_id, step_index)` (INV-LA-WD1). The wire shape is uniform: a
+   * withdraw still carries the full gate fields; the Portal only acts on the flag.
+   */
+  readonly withdraw?: boolean;
+  /**
+   * OPTIONAL (P3 Phase 2) — structured model advisory positions to surface
+   * beside SYSTEM WILL on the approval surface. Mapped verbatim (camel →
+   * snake) onto the wire; content was validated and durably persisted
+   * upstream (ucp.model_advisory.v1) before this call.
+   */
+  readonly modelAdvisories?: readonly {
+    readonly modelPositionId: string;
+    readonly positionHash: string;
+    readonly kind: PendingModelAdvisoryKind;
+    readonly explanation: string;
+    /** Core-local expected binding only; never emitted on the Portal wire. */
+    readonly artifactId?: string;
+    /**
+     * OPTIONAL (P4) — system-derived evidence basis for this position,
+     * carried verbatim from the ModelAdvisoryRecord. Absent for legacy
+     * (pre-P4) advisories; never synthesized at the bridge.
+     */
+    readonly evidenceBasis?: {
+      readonly derivation: "system_structural_v1";
+      readonly sources: readonly {
+        readonly source: string;
+        readonly availability: PendingEvidenceAvailability;
+        readonly detail?: string;
+      }[];
+      readonly evidenceBackedContradiction: "not_established";
+      readonly comprehension: "not_established";
+    };
+    readonly evidenceBasisId?: string;
+    readonly evidenceBasisRef?: {
+      readonly evidenceBasisId: string;
+      readonly evidenceBasisHash: string;
+    };
+  }[];
+  /**
+   * OPTIONAL (P3 Phase 2) — gate emission cycle. Omit/0 for ordinary gates;
+   * >= 1 when the gate is re-opened after a model advisory episode.
+   */
+  readonly gateCycle?: number;
+};
+
+/**
+ * Build the frozen wire payload from normalized input.
+ *
+ * Bounds rule (contract "Bounds & rules"): when `affectedResources` exceeds
+ * PENDING_AFFECTED_RESOURCES_LIMIT, only the first N are carried,
+ * `affected_resources_truncated` is true, and `affected_resources_total` holds the
+ * true pre-truncation count.
+ */
+export function buildPendingApprovalPayload(
+  input: PendingApprovalInput,
+): PendingApprovalPayloadV1 {
+  const stepIndex = Math.max(0, Math.trunc(input.stepIndex));
+
+  let systemWill: PendingApprovalSystemWill = {
+    summary: input.summary,
+    action_type: input.actionType,
+  };
+
+  if (input.affectedResources) {
+    const total = input.affectedResources.length;
+    const truncated = total > PENDING_AFFECTED_RESOURCES_LIMIT;
+    const list = truncated
+      ? input.affectedResources.slice(0, PENDING_AFFECTED_RESOURCES_LIMIT)
+      : input.affectedResources;
+    systemWill = {
+      ...systemWill,
+      affected_resources: list,
+      affected_resources_total: total,
+      affected_resources_truncated: truncated,
+    };
+  }
+
+  const base: PendingApprovalPayloadV1 = {
+    schema: PENDING_APPROVAL_SCHEMA,
+    run_id: input.runId,
+    step_index: stepIndex,
+    ucp_root_id: input.ucpRootId ?? null,
+    workflow_name: input.workflowName ?? null,
+    system_will: systemWill,
+    risk: input.risk,
+    requested_by: input.requestedBy ?? null,
+    requested_at: input.requestedAt,
+  };
+
+  // ttl_seconds is omitted entirely when 0/absent/non-positive (contract: 0/absent
+  // = no TTL). Only a positive integer rides the wire.
+  const ttl =
+    typeof input.ttlSeconds === "number" &&
+    Number.isFinite(input.ttlSeconds) &&
+    input.ttlSeconds > 0
+      ? Math.trunc(input.ttlSeconds)
+      : null;
+  const withTtl: PendingApprovalPayloadV1 = ttl !== null ? { ...base, ttl_seconds: ttl } : base;
+
+  // withdraw is omitted unless explicitly true (absent = a normal pending post).
+  const withWithdraw: PendingApprovalPayloadV1 =
+    input.withdraw === true ? { ...withTtl, withdraw: true } : withTtl;
+
+  // P3 Phase 2: advisory carriage + gate cycle — omitted entirely when absent
+  // (additive; old wire bytes for ordinary gates are unchanged).
+  const advisories = input.modelAdvisories;
+  const withAdvisories: PendingApprovalPayloadV1 =
+    advisories !== undefined && advisories.length > 0
+      ? {
+          ...withWithdraw,
+          model_advisories: advisories.map((a) => ({
+            model_position_id: a.modelPositionId,
+            position_hash:     a.positionHash,
+            kind:              a.kind,
+            explanation:       a.explanation,
+            // P4: carry the system-derived evidence basis when present;
+            // omitted entirely for legacy advisories (never synthesized).
+            ...(a.evidenceBasis !== undefined
+              ? {
+                  evidence_basis: {
+                    derivation: a.evidenceBasis.derivation,
+                    sources: a.evidenceBasis.sources.map((s) => ({
+                      source:       s.source,
+                      availability: s.availability,
+                      ...(s.detail !== undefined ? { detail: s.detail } : {}),
+                    })),
+                    evidence_backed_contradiction: a.evidenceBasis.evidenceBackedContradiction,
+                    comprehension:                 a.evidenceBasis.comprehension,
+                  },
+                }
+              : {}),
+            ...(a.evidenceBasisId !== undefined
+              ? { evidence_basis_id: a.evidenceBasisId }
+              : {}),
+            ...(a.evidenceBasisRef !== undefined
+              ? {
+                  evidence_basis_ref: {
+                    evidence_basis_id: a.evidenceBasisRef.evidenceBasisId,
+                    evidence_basis_hash: a.evidenceBasisRef.evidenceBasisHash,
+                  },
+                }
+              : {}),
+          })),
+        }
+      : withWithdraw;
+
+  const gateCycle =
+    typeof input.gateCycle === "number" &&
+    Number.isInteger(input.gateCycle) &&
+    input.gateCycle > 0
+      ? input.gateCycle
+      : null;
+  return gateCycle !== null ? { ...withAdvisories, gate_cycle: gateCycle } : withAdvisories;
+}
+
+export type PayloadValidation =
+  | { readonly ok: true }
+  | { readonly ok: false; readonly errors: readonly string[] };
+
+function isNonEmptyString(v: unknown): v is string {
+  return typeof v === "string" && v.trim().length > 0;
+}
+function isObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+
+function isNonNegativeInt(v: unknown): v is number {
+  return typeof v === "number" && Number.isInteger(v) && v >= 0;
+}
+
+function isPositiveInt(v: unknown): v is number {
+  return typeof v === "number" && Number.isInteger(v) && v > 0;
+}
+
+function isIsoTimestamp(v: unknown): boolean {
+  return isNonEmptyString(v) && !Number.isNaN(Date.parse(v));
+}
+
+/**
+ * Fail-closed validation. The transport step MUST call this before POSTing and
+ * MUST NOT send when `ok === false`. It mirrors the Lane B (Portal) acceptance
+ * contract (`validatePendingApprovalPayload`) so a payload this function accepts
+ * is one the Portal endpoint will accept on type grounds (auth + idempotency are
+ * separate, server-side concerns). Required fields - including system_will/risk/
+ * requested_at - are required even for a withdraw, matching the Portal.
+ */
+export function validatePendingApprovalPayload(
+  payload: PendingApprovalPayloadV1,
+): PayloadValidation {
+  const errors: string[] = [];
+
+  if (payload.schema !== PENDING_APPROVAL_SCHEMA) {
+    errors.push(`schema must be "${PENDING_APPROVAL_SCHEMA}"`);
+  }
+  if (!isNonEmptyString(payload.run_id)) errors.push("run_id must be a non-empty string");
+  if (!isNonNegativeInt(payload.step_index)) {
+    errors.push("step_index must be a non-negative integer");
+  }
+  if (!RISKS.includes(payload.risk)) {
+    errors.push(`risk must be one of ${RISKS.join(" | ")}`);
+  }
+  if (!isIsoTimestamp(payload.requested_at)) {
+    errors.push("requested_at must be an ISO-8601 timestamp");
+  }
+  if (payload.ucp_root_id !== null && typeof payload.ucp_root_id !== "string") {
+    errors.push("ucp_root_id must be a string or null");
+  }
+  if (payload.workflow_name !== null && typeof payload.workflow_name !== "string") {
+    errors.push("workflow_name must be a string or null");
+  }
+  if (payload.requested_by !== null && typeof payload.requested_by !== "string") {
+    errors.push("requested_by must be a string or null");
+  }
+  if (payload.ttl_seconds !== undefined && !isPositiveInt(payload.ttl_seconds)) {
+    errors.push("ttl_seconds, when present, must be a positive integer");
+  }
+  if (payload.withdraw !== undefined && typeof payload.withdraw !== "boolean") {
+    errors.push("withdraw, when present, must be a boolean");
+  }
+  if (payload.gate_cycle !== undefined && !isNonNegativeInt(payload.gate_cycle)) {
+    errors.push("gate_cycle, when present, must be a non-negative integer");
+  }
+
+  // P3 Phase 2: model advisory carriage — validated when present, omitted by
+  // default. ids are sha256 hex digests (64 lowercase hex chars).
+  if (payload.model_advisories !== undefined) {
+    const advs = payload.model_advisories;
+    if (!Array.isArray(advs)) {
+      errors.push("model_advisories, when present, must be an array");
+    } else {
+      if (advs.length > PENDING_MODEL_ADVISORIES_LIMIT) {
+        errors.push(`model_advisories exceeds the cap of ${PENDING_MODEL_ADVISORIES_LIMIT}`);
+      }
+      const seenO = new Set<string>();
+      const seenModelIds = new Map<string, string>();
+      const seenE = new Set<string>();
+      for (const a of advs) {
+        if (!a || typeof a !== "object") {
+          errors.push("model_advisories[] must be objects");
+          continue;
+        }
+        if (!/^[0-9a-f]{64}$/.test(a.model_position_id)) {
+          errors.push("model_advisories[].model_position_id must be a 64-char lowercase sha256 hex digest");
+        }
+        if (!/^[0-9a-f]{64}$/.test(a.position_hash)) {
+          errors.push("model_advisories[].position_hash must be a 64-char lowercase sha256 hex digest");
+        }
+        if (!PENDING_MODEL_ADVISORY_KINDS.includes(a.kind)) {
+          errors.push(
+            `model_advisories[].kind must be one of ${PENDING_MODEL_ADVISORY_KINDS.join(" | ")}`,
+          );
+        }
+        if (!isNonEmptyString(a.explanation)) {
+          errors.push("model_advisories[].explanation must be a non-empty string");
+        } else if (a.explanation.length > PENDING_MODEL_ADVISORY_EXPLANATION_LIMIT) {
+          errors.push(
+            `model_advisories[].explanation exceeds the cap of ${PENDING_MODEL_ADVISORY_EXPLANATION_LIMIT} chars`,
+          );
+        }
+        // P4: evidence basis — validated when present, omitted by default.
+        // Fail-closed: any value other than the literal "not_established" on
+        // the judgment-boundary fields is a wire error; the wire cannot carry
+        // an overclaim of contradiction or comprehension.
+        if (a.evidence_basis !== undefined) {
+          const eb = a.evidence_basis;
+          if (!eb || typeof eb !== "object") {
+            errors.push("model_advisories[].evidence_basis must be an object");
+          } else {
+            if (eb.derivation !== "system_structural_v1") {
+              errors.push('model_advisories[].evidence_basis.derivation must be "system_structural_v1"');
+            }
+            if (eb.evidence_backed_contradiction !== "not_established") {
+              errors.push('model_advisories[].evidence_basis.evidence_backed_contradiction must be "not_established"');
+            }
+            if (eb.comprehension !== "not_established") {
+              errors.push('model_advisories[].evidence_basis.comprehension must be "not_established"');
+            }
+            if (!Array.isArray(eb.sources)) {
+              errors.push("model_advisories[].evidence_basis.sources must be an array");
+            } else {
+              if (eb.sources.length > PENDING_EVIDENCE_SOURCES_LIMIT) {
+                errors.push(`model_advisories[].evidence_basis.sources exceeds the cap of ${PENDING_EVIDENCE_SOURCES_LIMIT}`);
+              }
+              for (const s of eb.sources) {
+                if (!s || typeof s !== "object") {
+                  errors.push("model_advisories[].evidence_basis.sources[] must be objects");
+                  continue;
+                }
+                if (!isNonEmptyString(s.source)) {
+                  errors.push("model_advisories[].evidence_basis.sources[].source must be a non-empty string");
+                }
+                if (!PENDING_EVIDENCE_AVAILABILITY.includes(s.availability)) {
+                  errors.push(
+                    `model_advisories[].evidence_basis.sources[].availability must be one of ${PENDING_EVIDENCE_AVAILABILITY.join(" | ")}`,
+                  );
+                }
+                if (s.detail !== undefined) {
+                  if (typeof s.detail !== "string") {
+                    errors.push("model_advisories[].evidence_basis.sources[].detail must be a string");
+                  } else if (s.detail.length > PENDING_EVIDENCE_DETAIL_LIMIT) {
+                    errors.push(
+                      `model_advisories[].evidence_basis.sources[].detail exceeds the cap of ${PENDING_EVIDENCE_DETAIL_LIMIT} chars`,
+                    );
+                  }
+                }
+              }
+            }
+          }
+        }
+        if (a.evidence_basis_id !== undefined && !/^[0-9a-f]{64}$/.test(a.evidence_basis_id)) {
+          errors.push("model_advisories[].evidence_basis_id must be a 64-char lowercase sha256 hex digest");
+        }
+        const pair = `${a.model_position_id}:${a.position_hash}`;
+        if (seenO.has(pair)) errors.push("model_advisories[] contains a duplicate O pair");
+        seenO.add(pair);
+        const priorHash = seenModelIds.get(a.model_position_id);
+        if (priorHash !== undefined && priorHash !== a.position_hash) {
+          errors.push("model_advisories[] contains one model_position_id with conflicting position_hash values");
+        }
+        seenModelIds.set(a.model_position_id, a.position_hash);
+        if (a.evidence_basis_ref !== undefined) {
+          const ref = a.evidence_basis_ref;
+          if (
+            !isObject(ref) ||
+            Object.keys(ref).sort().join(",") !== "evidence_basis_hash,evidence_basis_id" ||
+            !/^[0-9a-f]{64}$/.test(String(ref["evidence_basis_id"])) ||
+            !/^[0-9a-f]{64}$/.test(String(ref["evidence_basis_hash"]))
+          ) {
+            errors.push("model_advisories[].evidence_basis_ref must contain exact lowercase id/hash");
+          } else {
+            const ePair = `${ref["evidence_basis_id"]}:${ref["evidence_basis_hash"]}`;
+            if (seenE.has(ePair)) errors.push("model_advisories[] contains a shared evidence basis ref");
+            seenE.add(ePair);
+            if (
+              ref["evidence_basis_id"] === a.model_position_id ||
+              ref["evidence_basis_id"] === a.position_hash ||
+              ref["evidence_basis_hash"] === a.model_position_id ||
+              ref["evidence_basis_hash"] === a.position_hash
+            ) {
+              errors.push("model_advisories[].evidence_basis_ref is type-confused with O");
+            }
+          }
+        }
+      }
+      // Coherence: advisory carriage implies a re-opened gate (cycle >= 1), and
+      // a cycle-0 gate never carries advisories.
+      if (advs.length > 0 && (payload.gate_cycle === undefined || payload.gate_cycle === 0)) {
+        errors.push("model_advisories present requires gate_cycle >= 1");
+      }
+    }
+  }
+  if (
+    payload.gate_cycle !== undefined &&
+    payload.gate_cycle > 0 &&
+    (payload.model_advisories === undefined || payload.model_advisories.length === 0)
+  ) {
+    errors.push("gate_cycle >= 1 requires at least one model_advisories entry");
+  }
+
+  const sw = payload.system_will;
+  if (!sw || typeof sw !== "object") {
+    errors.push("system_will is required");
+  } else {
+    if (!isNonEmptyString(sw.summary)) {
+      errors.push("system_will.summary must be a non-empty string");
+    }
+    if (!ACTION_TYPES.includes(sw.action_type)) {
+      errors.push(`system_will.action_type must be one of ${ACTION_TYPES.join(" | ")}`);
+    }
+    if (sw.affected_resources !== undefined) {
+      if (sw.affected_resources.length > PENDING_AFFECTED_RESOURCES_LIMIT) {
+        errors.push(
+          `system_will.affected_resources exceeds the cap of ${PENDING_AFFECTED_RESOURCES_LIMIT}`,
+        );
+      }
+      for (const r of sw.affected_resources) {
+        if (!isNonEmptyString(r.path)) {
+          errors.push("system_will.affected_resources[].path must be a non-empty string");
+        }
+        if (!CHANGE_TYPES.includes(r.change_type)) {
+          errors.push(
+            `system_will.affected_resources[].change_type must be one of ${CHANGE_TYPES.join(" | ")}`,
+          );
+        }
+      }
+      // Truncation flags must be self-consistent when resources are present.
+      if (
+        sw.affected_resources_truncated === true &&
+        sw.affected_resources.length < PENDING_AFFECTED_RESOURCES_LIMIT
+      ) {
+        errors.push("system_will.affected_resources_truncated is true but the list is below the cap");
+      }
+      if (
+        typeof sw.affected_resources_total === "number" &&
+        sw.affected_resources_total < sw.affected_resources.length
+      ) {
+        errors.push("system_will.affected_resources_total is less than the carried list length");
+      }
+    }
+  }
+
+  return errors.length === 0 ? { ok: true } : { ok: false, errors };
+}

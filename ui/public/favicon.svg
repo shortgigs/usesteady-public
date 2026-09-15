@@ -1,0 +1,22 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" role="img" aria-label="UseSteady">
+  <title>UseSteady</title>
+  <defs>
+    <radialGradient id="fav-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00D4FF" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00D4FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="48" height="48" rx="11" fill="#050911"/>
+  <rect width="48" height="48" rx="11" fill="url(#fav-glow)"/>
+  <rect x="0.5" y="0.5" width="47" height="47" rx="10.5" stroke="#00D4FF" stroke-opacity="0.3"/>
+
+  <!--
+    Favicon variant: drop the review line (too small to read below 32px).
+    Heavier checkmark stroke for legibility at 16–32px.
+  -->
+  <path d="M13.5 27 L20 34 L34.5 19.5"
+        stroke="#00D4FF" stroke-width="3.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
