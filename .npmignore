@@ -1,0 +1,43 @@
+# Files excluded from the published npm package.
+# The package.json "files" field is the positive allow-list;
+# this file adds an extra safeguard for files that must never be published.
+
+# Private ops files (belong in shortgigs/usesteady-ops, not public npm)
+src/shell/cli/friction-admin.ts
+src/shell/cli/friction-admin.js
+src/shell/cli/payout-mercury.ts
+src/shell/cli/payout-mercury.js
+dist/src/shell/cli/friction-admin.js
+dist/src/shell/cli/friction-admin.d.ts
+dist/src/shell/cli/payout-mercury.js
+dist/src/shell/cli/payout-mercury.d.ts
+
+# Source — only dist/ ships, not source
+src/
+tests/
+scripts/
+marketing/
+skills/
+docs/
+examples/
+
+# Config and dev tooling
+tsconfig*.json
+.eslintrc*
+.prettierrc*
+vitest.config*
+playwright.config*
+
+# CI
+.github/
+
+# Dev artifacts
+*.log
+.env
+.env.local
+.cursor/
+.playwright-mcp/
+
+# OS
+.DS_Store
+Thumbs.db

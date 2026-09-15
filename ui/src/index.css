@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+
+  /* Electric cyan brand accent */
+  --color-brand:        #00D4FF;
+  --color-brand-dim:    color-mix(in srgb, #00D4FF 15%, transparent);
+  --color-brand-faint:  color-mix(in srgb, #00D4FF 6%, transparent);
+  --color-brand-border: color-mix(in srgb, #00D4FF 22%, transparent);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-gray-950 text-gray-100 font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+    /* Subtle grid texture — 1% opacity, fixed so it doesn't scroll */
+    background-image:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-attachment: fixed;
+  }
+
+  code, pre, .font-mono {
+    @apply font-mono;
+  }
+}
+
+/* ─── Keyframe animations ──────────────────────────────────────────────────── */
+
+@keyframes slideUpFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@keyframes fadeInOnce {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Single gentle pulse: briefly brighter then settles */
+@keyframes glowPulseOnce {
+  0%   { opacity: 0.4; }
+  45%  { opacity: 1;   }
+  100% { opacity: 0.6; }
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(31 41 55) transparent;
+  }
+
+  /* Reveal animations */
+  .animate-slide-up-fade-in {
+    animation: slideUpFadeIn 0.25s ease-out both;
+  }
+  .animate-fade-in-once {
+    animation: fadeInOnce 0.6s ease-out both;
+  }
+  .animate-glow-pulse-once {
+    animation: glowPulseOnce 2.4s ease-out both;
+  }
+  .animate-slide-in-right {
+    animation: slideInFromRight 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  /* Brand accent helpers */
+  .text-brand        { color: #00D4FF; }
+  .bg-brand          { background-color: #00D4FF; }
+  .border-brand      { border-color: #00D4FF; }
+  .ring-brand        { --tw-ring-color: #00D4FF; }
+  .bg-brand-dim      { background-color: color-mix(in srgb, #00D4FF 10%, transparent); }
+  .bg-brand-faint    { background-color: color-mix(in srgb, #00D4FF 5%, transparent); }
+  .border-brand-soft { border-color: color-mix(in srgb, #00D4FF 20%, transparent); }
+}
