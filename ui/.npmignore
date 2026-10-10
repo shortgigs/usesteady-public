@@ -1,0 +1,9 @@
+# The root package.json "files" field includes ui/dist/ for the npm publish.
+# This file overrides ui/.gitignore so the built dist is NOT excluded from
+# the published package (ui/.gitignore lists "dist" which npm would otherwise
+# honour when no .npmignore exists).
+node_modules
+*.local
+*.log
+src/
+public/

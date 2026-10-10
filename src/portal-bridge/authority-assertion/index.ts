@@ -1,0 +1,54 @@
+export { canonicalizeJson } from "./canonical.js";
+export {
+  appendPortalAuthorityEvidence,
+  portalAuthorityEvidencePath,
+  PORTAL_AUTHORITY_EVIDENCE_FILE,
+  type PortalAuthorityEvidenceRecord,
+} from "./evidence.js";
+export {
+  normalizeGateBasisSystemWill,
+  pendingGateDecisionBasisFromInput,
+  pendingGateDecisionBasisFromPayload,
+} from "./gate-basis.js";
+export {
+  loadPortalAuthorityTrust,
+  PORTAL_AUTHORITY_KEYS_ENV,
+  type PortalAuthorityTrust,
+  type PortalAuthorityTrustResolution,
+} from "./trust.js";
+export {
+  AUTHORITY_ASSERTION_SCHEMA,
+  AUTHORITY_ASSERTION_V2_SCHEMA,
+  DECISION_ORIGIN_SCHEMA,
+  RETIREMENT_AUTHORITY_ASSERTION_V3_SCHEMA,
+  RETIREMENT_DECISION_ORIGIN_V2_SCHEMA,
+  AUTHORITY_DECISION_RELATION_SUPERSESSION,
+  AUTHORITY_DECISION_RELATION_RETIREMENT,
+  type AuthorityDecisionRelation,
+  type AuthorityAssertionModelPositionRef,
+  type AuthorityAssertionPayloadV1,
+  type AuthorityAssertionV1,
+  type AuthorityAssertion,
+  type DecisionOriginV1,
+  type DecisionOriginAuthorityAssertionV2,
+  type AuthorityEvidenceStatus,
+  type AuthorityVerificationFailure,
+  type AuthorityVerificationResult,
+  type DecisionOriginAuthorityVerificationResult,
+  type ExpectedAuthorityBinding,
+  type MappedRetirementDiagnostic,
+  type RetirementAuthorityAssertionV3,
+  type RetirementAuthorityVerificationResult,
+  type RetirementBasisRelationV1,
+  type RetirementDecisionOriginV2,
+} from "./types.js";
+export {
+  parseAuthorityAssertion,
+  parseDecisionOriginAuthorityAssertionV2,
+  parseRetirementAuthorityAssertionV3,
+  parseRetirementDecisionOriginV2,
+  canonicalRetirementRelations,
+  verifyAuthorityAssertion,
+  verifyDecisionOriginAuthorityAssertionV2,
+  verifyRetirementAuthorityAssertionV3,
+} from "./verify.js";

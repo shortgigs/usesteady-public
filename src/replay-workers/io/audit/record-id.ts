@@ -1,0 +1,57 @@
+/**
+ * Deterministic replay namespace audit per-scope I/O identity.
+ * @see docs/product/replay-namespace-audit-append-only-implementation-contract-v1.md
+ */
+
+import { createHash } from "node:crypto";
+
+import type { ReplayNamespaceAuditAppendOnlyScope } from "./constants.js";
+import type {
+  ReplayWorkerPerScopeIoEligibilityState,
+  ReplayWorkerPerScopeIoState,
+} from "./types.js";
+
+export function replayWorkerPerScopeIoEligibilityId(input: {
+  readonly replay_worker_mutation_id: string;
+  readonly replay_execution_id: string;
+  readonly replay_worker_per_scope_io_eligibility_state: ReplayWorkerPerScopeIoEligibilityState;
+  readonly reason: string;
+  readonly blocking_cause: string;
+}): string {
+  const payload = [
+    input.replay_worker_mutation_id.trim(),
+    input.replay_execution_id.trim(),
+    input.replay_worker_per_scope_io_eligibility_state.trim(),
+    input.reason.trim(),
+    input.blocking_cause.trim(),
+  ].join("\0");
+  return createHash("sha256").update(payload).digest("hex");
+}
+
+export function replayWorkerPerScopeIoId(input: {
+  readonly replay_execution_id: string;
+  readonly replay_worker_per_scope_io_scope: ReplayNamespaceAuditAppendOnlyScope;
+  readonly replay_worker_per_scope_io_state: ReplayWorkerPerScopeIoState;
+  readonly replay_worker_per_scope_io_version: string;
+}): string {
+  const payload = [
+    input.replay_execution_id.trim(),
+    input.replay_worker_per_scope_io_scope.trim(),
+    input.replay_worker_per_scope_io_state.trim(),
+    input.replay_worker_per_scope_io_version.trim(),
+  ].join("\0");
+  return createHash("sha256").update(payload).digest("hex");
+}
+
+export function replayNamespaceAuditLineId(input: {
+  readonly replay_worker_per_scope_io_id: string;
+  readonly replay_worker_mutation_id: string;
+  readonly message: string;
+}): string {
+  const payload = [
+    input.replay_worker_per_scope_io_id.trim(),
+    input.replay_worker_mutation_id.trim(),
+    input.message.trim(),
+  ].join("\0");
+  return createHash("sha256").update(payload).digest("hex");
+}

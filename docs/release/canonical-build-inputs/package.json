@@ -1,0 +1,102 @@
+{
+  "name": "usesteady",
+  "version": "0.1.0-alpha.74",
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Inspect workflows before execution. UseSteady inspects a workflow, shows the exact SYSTEM WILL operation, and waits for approval before each interactive step. Resume from a visible token without inheriting prior approval.",
+  "homepage": "https://usesteady.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shortgigs/usesteady-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shortgigs/usesteady-public/issues"
+  },
+  "keywords": [
+    "ai-workflow",
+    "workflow-runner",
+    "workflow-inspection",
+    "resume-token",
+    "human-in-the-loop",
+    "approval-gate",
+    "survivable-execution",
+    "developer-cli",
+    "ci-cd",
+    "long-running-workflows"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "usesteady": "./bin/use-steady.js"
+  },
+  "files": [
+    "dist/",
+    "bin/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "verify": "bash scripts/verify-rules.sh",
+    "test": "vitest run",
+    "check:encoding": "node scripts/fix-github-surfaces.mjs --check",
+    "test:e2e": "playwright test",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "check:stdin-ownership": "node scripts/check-stdin-ownership.mjs",
+    "sanitize:package": "node scripts/sanitize-package.mjs",
+    "verify:pack-clean": "node scripts/verify-pack-clean.mjs",
+    "prepack": "node scripts/sanitize-package.mjs",
+    "test:release": "node scripts/run-release-tests.mjs",
+    "release:gate": "npm run build && npm run check:stdin-ownership && npm run test:release",
+    "run-workflow": "tsx src/shell/cli/main.ts workflow",
+    "history": "tsx src/shell/cli/main.ts history",
+    "serve": "npx tsx server.ts",
+    "ui:dev": "npm run serve & cd ui && npm run dev",
+    "ui:build": "cd ui && npm run build",
+    "prepublishOnly": "npm run build && npm run ui:build",
+    "demo:setup": "npx tsx demo/setup.ts",
+    "demo:record": "npm run demo:setup && npx playwright test --config=demo/demo.config.ts",
+    "demo:open-report": "npx playwright show-report demo/artifacts/report",
+    "cert:e3-audit": "node scripts/cert-enterprise-e3-audit.mjs",
+    "cert:e6-recovery": "node scripts/cert-enterprise-e6-recovery.mjs",
+    "dev:cli": "tsx src/governed-decision/cli-entry.ts",
+    "test:cli": "vitest run tests/governed-decision/cli-json.test.ts tests/governed-decision/cli.test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.91.1",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.8.0",
+    "cors": "^2.8.5",
+    "express": "4.22.3",
+    "express-rate-limit": "^8.3.2",
+    "ink": "^7.0.0",
+    "openai": "^6.34.0",
+    "posthog-node": "^5.29.2",
+    "react": "^19.2.5",
+    "resend": "^6.12.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/node": "^20.12.0",
+    "@types/react": "^19.2.14",
+    "tsx": "^4.19.3",
+    "typescript": "^5.4.5",
+    "vitest": "^4.1.5",
+    "zod": "^3.25.76"
+  }
+}

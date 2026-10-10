@@ -1,0 +1,33 @@
+# .gitattributes — UseSteady
+# Opt out of GitHub Linguist statistics (keeps repo language detection clean)
+# and signals to GitHub Copilot / AI tooling that this code is private IP.
+
+# ── GitHub AI training opt-out ───────────────────────────────────────────────
+# GitHub respects this attribute to exclude content from Copilot training data.
+* linguist-generated=false
+
+# Mark generated / dist artefacts so they don't inflate language stats
+dist/**         linguist-generated=true
+*.js.map        linguist-generated=true
+*.d.ts          linguist-generated=true
+
+# Ensure consistent line-endings across platforms
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Treat binary assets as binary (no diffs)
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.eot  binary
+
+# Archive exports — exclude generated files from source snapshots
+dist/**         export-ignore
+node_modules/** export-ignore
+.playwright-mcp/** export-ignore
